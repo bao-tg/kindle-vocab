@@ -10,6 +10,7 @@ node_modules
 
 # Exclude the data directory, which contains the Obsidian vault data.
 src/data/
+src/data/vocab.db
 
 # Don't include the compiled main.js file in the repo.
 # They should be uploaded to GitHub releases instead.
