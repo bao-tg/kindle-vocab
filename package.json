@@ -1,8 +1,8 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-kindle-vocab-plugin",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
-	"main": "main.js",
+	"description": "This is a sample Obsidian plugin that syncs your Kindle vocabulary builders with Obsidian.",
+	"main": "src/main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",

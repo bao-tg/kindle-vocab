@@ -1,11 +1,10 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
+	"id": "obsidian-kindle-vocab-plugin",
+	"name": "Kindle Vocabulary Builders",
 	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
-	"isDesktopOnly": false
-}
+	"description": "Sync your Kindle vocabulary builders with Obsidian.",
+	"author": "Truong Gia Bao",
+	"authorUrl": "https://github.com/bao-tg",
+	"isDesktopOnly": true,
+	"main": "main.js"  
+  }
