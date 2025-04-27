@@ -1,6 +1,8 @@
 import { App, Modal, Notice, ButtonComponent, normalizePath, TFile } from 'obsidian';
 import * as Papa from 'papaparse';
 import initSqlJs, { Database } from 'sql.js';
+import { getVocabDbPath, getDictionaryCsvPath } from '../utils/PathHelper';
+import { get } from 'http';
 
 export class SyncDatabaseModal extends Modal {
 	constructor(app: App) {
@@ -10,30 +12,43 @@ export class SyncDatabaseModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 		contentEl.empty();
-
-		contentEl.createEl('h2', { text: 'Sync Webster Dictionary' });
-
-		new ButtonComponent(contentEl)
-			.setButtonText('Sync')
+	
+		contentEl.createEl('h2', { text: 'Sync Your Vocabulary Builder' });
+	
+		contentEl.createEl('p', {
+			text: 'This will synchronize your Kindle lookups and create a markdown summary. Make sure your vocab database and dictionary file are ready.'
+		});
+	
+		const buttonContainer = contentEl.createDiv({
+			cls: 'sync-button-container'
+		});
+	
+		new ButtonComponent(buttonContainer)
+			.setButtonText('🔄 Start Sync')
 			.setCta()
 			.onClick(() => this.syncDatabase());
 	}
+	
 
 	private async syncDatabase() {
 		try {
 			new Notice('Starting sync...');
-
+	
 			// 1. Initialize SQL.js
 			const SQL = await initSqlJs({ locateFile: (file) => `https://sql.js.org/dist/${file}` });
-
+	
 			// 2. Load vocab.db
-			const dbPath = normalizePath('.obsidian/plugins/obsidian-kindle-vocab-plugin/src/data/vocab.db');
+			const dbPath = getVocabDbPath();
+			if (!(await this.app.vault.adapter.exists(dbPath))) {
+				new Notice('❌ vocab.db not found. Please upload your vocab database first.');
+				throw new Error('vocab.db file not found.');
+			}
 			const arrayBuffer = await this.app.vault.adapter.readBinary(dbPath);
 			const db = new SQL.Database(new Uint8Array(arrayBuffer));
-
+	
 			// 3. Drop old table if exists
 			db.run(`DROP TABLE IF EXISTS "websters-dictionary"`);
-
+	
 			// 4. Create new table
 			db.run(`
 				CREATE TABLE "websters-dictionary" (
@@ -41,21 +56,25 @@ export class SyncDatabaseModal extends Modal {
 					information TEXT
 				)
 			`);
-
+	
 			// 5. Read CSV from Vault
-			const csvPath = normalizePath('.obsidian/plugins/obsidian-kindle-vocab-plugin/src/data/websters-dictionary.csv');
+			const csvPath = getDictionaryCsvPath();
+			if (!(await this.app.vault.adapter.exists(csvPath))) {
+				new Notice('❌ Dictionary CSV not found. Please upload your dictionary first.');
+				throw new Error('Dictionary CSV file not found.');
+			}
 			const csvContent = await this.app.vault.adapter.read(csvPath);
-			const rows = this.parseCsv(csvContent);
-
+			const rows = await this.parseCsv(csvContent);
+	
 			// 6. Insert each CSV row into the table
 			const insertStmt = db.prepare(`
 				INSERT INTO "websters-dictionary" (word, information) VALUES (?, ?)
 			`);
-			for (const [word, information] of await rows) {
+			for (const [word, information] of rows) {
 				insertStmt.run([word, information]);
 			}
 			insertStmt.free();
-
+	
 			// 7. Execute query for recent lookups
 			const query = `
 				SELECT 
@@ -69,39 +88,41 @@ export class SyncDatabaseModal extends Modal {
 				JOIN BOOK_INFO bi ON l.book_key = bi.id
 				ORDER BY l.timestamp DESC
 			`;
-
+	
 			const result = db.exec(query);
-
+	
 			if (result.length === 0) {
+				new Notice('⚠️ No recent lookups found in your vocab.db.');
 				throw new Error('No lookup results found.');
 			}
-
+	
 			const markdownContent = this.formatMarkdown(result[0]);
-
+	
 			// 8. Save Markdown file
 			const mdPath = normalizePath('My Vocabulary Builder.md');
 			await this.app.vault.adapter.write(mdPath, markdownContent);
-
+	
 			// 9. Save updated DB back
 			const updatedDbArray = db.export();
 			await this.app.vault.adapter.writeBinary(dbPath, updatedDbArray);
-
+	
 			db.close();
 			new Notice('Sync complete! Markdown created.');
-
-            // 10. Auto-open the Markdown file
-            const recentLookupsFile = this.app.vault.getAbstractFileByPath(mdPath);
-
-            if (recentLookupsFile instanceof TFile) {
-                await this.app.workspace.getLeaf(true).openFile(recentLookupsFile);
-}
+	
+			// 10. Auto-open the Markdown file
+			const recentLookupsFile = this.app.vault.getAbstractFileByPath(mdPath);
+			if (recentLookupsFile instanceof TFile) {
+				await this.app.workspace.getLeaf(true).openFile(recentLookupsFile);
+			}
+	
 		} catch (error) {
 			console.error(error);
-			new Notice('Sync failed. Check console.');
+			new Notice('Sync failed. Check console for more details.');
 		} finally {
 			this.close();
 		}
 	}
+	
 
     private async parseCsv(content: string): Promise<[string, string][]> {
         const parsed = Papa.parse<string[]>(content, {

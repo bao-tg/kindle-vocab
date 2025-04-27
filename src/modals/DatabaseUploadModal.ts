@@ -13,7 +13,7 @@ export class DatabaseUploadModal extends Modal {
 	onOpen() {
 		const { contentEl } = this;
 
-		contentEl.createEl('h2', { text: 'Upload a Database File' });
+		contentEl.createEl('h2', { text: 'Upload a Vocabulary file (DB)' });
 
 		this.fileInputEl = contentEl.createEl('input', {
 			type: 'file',
