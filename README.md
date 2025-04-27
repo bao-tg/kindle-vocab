@@ -1,4 +1,10 @@
-# Kindle Vocabulary Sync
+# Implicit Deep Learning Package
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://your-docs-link.com)
+
+**Authors**: [Hoang Phan](#), [Bao Tran](#), Chi Nguyen, Bao Truong, Thanh Tran, [Khai Nguyen](#), [Alicia Y. Tsai](#), [Hong Chu](#), [Laurent El Ghaoui](#)
+
 
 Easily sync your Kindle vocabulary lookups into Obsidian, generate beautiful Markdown summaries, and build your personal learning library.
 
