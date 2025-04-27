@@ -16,7 +16,7 @@ Easily sync your Kindle vocabulary lookups into Obsidian, generate beautiful Mar
 # How to use
 
 1. Open the command "Upload your vocabulary database", and upload your Kindle `vocab.db` file, this file can be found when you connect your Kindle device to your laptop.
-2. Download the dictionary file here: [websters-dictionary.csv][https://drive.google.com/file/d/1HV95XUzdCYExa1_eXrRbHHtCk4itSlYJ/view?usp=sharing]. Since the dictionary file provided by Amazon is DRM protected, so we will use the free online dictionary instead.
+2. Download the dictionary file here: [websters-dictionary.csv](https://drive.google.com/file/d/1HV95XUzdCYExa1_eXrRbHHtCk4itSlYJ/view?usp=sharing). Since the dictionary file provided by Amazon is DRM protected, so we will use the free online dictionary instead.
 3. Open the command "Upload your dictionary file", and upload your `websters-dictionary.csv` file.
 4. Click the **Sync** icon in the ribbon on the left sidebar.
 5. Click **Start Sync** inside the modal popup.
@@ -43,4 +43,4 @@ Add the references
 
 # Buy me a coffee
 
-[Buy me a coffee][buymeacoffee.com/baotg]
+[Buy me a coffee](buymeacoffee.com/baotg)
