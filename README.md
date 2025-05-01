@@ -10,7 +10,7 @@
 
 ---
 
-## ✨ Features
+## Features
 
 - Automatically generates a Markdown file summarizing your recent Kindle lookups.
 - One-click sync from within Obsidian.
@@ -18,7 +18,7 @@
 
 ---
 
-## 🔧 Installation
+## Installation
 
 1. Download the latest release of **Kindle Vocabulary Sync**.
 2. Place the plugin folder into your Obsidian vault under `.obsidian/plugins/`.
@@ -26,22 +26,28 @@
 
 ---
 
-## 🚀 How to Use
+## How to Use
 
 1. Open the command palette and run **"Upload your vocabulary database"**.  
    Upload your Kindle `vocab.db` file (retrieved by connecting your Kindle to your computer).
+
+![Image 1](image/image.png)
+
 2. Download the dictionary file here:  
    📘 [websters-dictionary.csv](https://drive.google.com/file/d/1HV95XUzdCYExa1_eXrRbHHtCk4itSlYJ/view?usp=sharing)  
    _Note: Amazon's dictionary is DRM-protected ([read more](https://learn.microsoft.com/vi-vn/windows-hardware/drivers/audio/digital-rights-management)), so we use a public alternative._
 3. Run **"Upload your dictionary file"** and select the downloaded `websters-dictionary.csv`.
 4. Click the **Sync** icon in the left sidebar ribbon.
 5. In the modal popup, click **Start Sync**.
+
+![Image 2](image/image-1.png)
+
 6. A new file named `My Vocabulary Builder.md` will be generated containing your lookups and definitions.
 7. Review, edit, and study your vocabulary directly in Obsidian.
 
 ---
 
-## ❓ FAQ
+## FAQ
 
 **Q: Can I use my own dictionary file?**  
 A: Yes. You can update the dictionary path in Settings. Make sure the file follows the `[word, definition]` format.
@@ -51,15 +57,15 @@ A: It will be automatically overwritten with the latest synced content.
 
 ---
 
-## 🧑‍💻 For Developers
+## For Developers
 
-_Developer documentation coming soon._
+[Developers' documentation](https://bao-tg.github.io/blog/Obsidian_Kindle_Vocab)
 
 Contributions are welcome! Please open an issue or submit a pull request if you have ideas or improvements.
 
 ---
 
-## 📚 References
+## References
 
 - [Obsidian Plugin Developer Guide](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)  
 - [GCIDE: GNU Collaborative International Dictionary of English](https://gcide.gnu.org.ua/)  
@@ -68,19 +74,19 @@ Contributions are welcome! Please open an issue or submit a pull request if you 
 
 ---
 
-## 🧭 Future Features
+## Future Features
 
 - Sync directly with Amazon accounts, removing the need to manually upload `vocab.db`.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ---
 
-## ☕ Say Thanks
+## Say Thanks
 
 If you like this plugin and would like to support its development, you can:
 
