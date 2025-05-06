@@ -1,7 +1,7 @@
 # Kindle Vocabulary Sync Plugin for Obsidian
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
-[![Documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://your-docs-link.com)
+[![Developers' documentation](https://bao-tg.github.io/blog/Obsidian_Kindle_Vocab))
 
 **Kindle Vocabulary Sync** is a powerful Obsidian plugin that enables users to seamlessly import vocabulary lookups from Kindle devices and convert them into structured Markdown notes. Designed for lifelong learners, this tool helps build a personalized vocabulary library within Obsidian for review, study, and long-term retention.
 
@@ -54,14 +54,6 @@ A: Yes. You can update the dictionary path in Settings. Make sure the file follo
 
 **Q: What happens if I already have a `My Vocabulary Builder.md` file?**  
 A: It will be automatically overwritten with the latest synced content.
-
----
-
-## For Developers
-
-[Developers' documentation](https://bao-tg.github.io/blog/Obsidian_Kindle_Vocab)
-
-Contributions are welcome! Please open an issue or submit a pull request if you have ideas or improvements.
 
 ---
 
