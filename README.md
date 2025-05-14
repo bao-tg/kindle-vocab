@@ -71,6 +71,7 @@ A: It will be automatically overwritten with the latest synced content.
 - Sync directly with Amazon accounts, removing the need to manually upload `vocab.db`.
 - Sync with Anki through Obsidian. There is a repository that directly syncs the vocab.db to Anki.
 - A system that allows the users to mark the word as "learned" or "unlearned".
+- Add IPA pronunciation.
 ---
 
 ## License
