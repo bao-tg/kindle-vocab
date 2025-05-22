@@ -15,6 +15,7 @@
 - Automatically generates a Markdown file summarizing your recent Kindle lookups.
 - One-click sync from within Obsidian.
 - Supports custom dictionary sources.
+- Mark a word as "Learned/Unlearned".
 
 ---
 
