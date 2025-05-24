@@ -44,7 +44,7 @@ export class DictionaryUploadModal extends Modal {
         const extension = file.name.split('.').pop()?.toLowerCase() || '';
 
         if (!this.allowedExtensions.has(extension)) {
-            new Notice('Invalid file type. Please upload a valid database file.');
+            new Notice('Invalid file type. Please upload a valid dictionary file.');
             return;
         }
 
@@ -58,10 +58,10 @@ export class DictionaryUploadModal extends Modal {
             const arrayBuffer = await file.arrayBuffer();
             const uint8Array = new Uint8Array(arrayBuffer);
             await this.saveFile(uint8Array);
-            new Notice('Database uploaded and saved successfully!');
+            new Notice('Dictionary uploaded and saved successfully!');
         } catch (err) {
             console.error(err);
-            new Notice('Failed to save the database file.');
+            new Notice('Failed to save the dictionary file.');
         }
 
         this.close();

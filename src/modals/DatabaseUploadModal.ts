@@ -1,4 +1,6 @@
-import { App, Modal, Notice, ButtonComponent, normalizePath, TFile, Vault } from 'obsidian';
+import { App, Modal, Notice, ButtonComponent, normalizePath } from 'obsidian';
+import initSqlJs from 'sql.js/dist/sql-wasm.js'; // ✅ This ensures wasm build is compatible
+
 
 export class DatabaseUploadModal extends Modal {
 	private fileInputEl: HTMLInputElement;
@@ -47,20 +49,57 @@ export class DatabaseUploadModal extends Modal {
 			return;
 		}
 
-		const maxSizeInGB = 1;
-		if (file.size > maxSizeInGB * 1024 * 1024 * 1024) {
-			new Notice(`File is too large. Max allowed size: ${maxSizeInGB}MB.`);
-			return;
-		}
-
 		try {
 			const arrayBuffer = await file.arrayBuffer();
-			const uint8Array = new Uint8Array(arrayBuffer);
-			await this.saveFile(uint8Array);
-			new Notice('Database uploaded and saved successfully!');
+			const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.wasm` });
+
+			const vault = this.app.vault;
+			const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
+			const currentExists = await vault.adapter.exists(filePath);
+
+			if (!currentExists) {
+				// ✅ File doesn't exist → directly save the uploaded file
+				await this.saveFile(new Uint8Array(arrayBuffer));
+				new Notice('✅ vocab.db uploaded successfully.');
+			} else {
+				// ✅ File exists → merge all tables except "dictionary"
+				const currentDBData = await vault.adapter.readBinary(filePath);
+				const currentDB = new SQL.Database(new Uint8Array(currentDBData));
+				const newDB = new SQL.Database(new Uint8Array(arrayBuffer));
+
+				const res = newDB.exec(`SELECT name FROM sqlite_master WHERE type='table';`);
+				const newTables = res[0].values.map(row => row[0]).filter(name => name !== 'MAIN');
+
+				for (const tableName of newTables) {
+					const tableSQLs = newDB.exec(`SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName}'`);
+					if (tableSQLs.length > 0) {
+						const createSQL = tableSQLs[0].values[0][0];
+						currentDB.run(`DROP TABLE IF EXISTS ${tableName};`);
+						if (typeof createSQL === 'string') {
+							currentDB.run(createSQL);
+						}
+
+						const rows = newDB.exec(`SELECT * FROM ${tableName}`);
+						if (rows.length > 0) {
+							const columns = rows[0].columns;
+							for (const row of rows[0].values) {
+								const placeholders = row.map(() => '?').join(', ');
+								currentDB.run(
+									`INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${placeholders});`,
+									row
+								);
+							}
+						}
+					}
+				}
+
+				const mergedData = currentDB.export();
+				await this.saveFile(new Uint8Array(mergedData));
+				new Notice('✅ Database updated (excluding dictionary table).');
+			}
 		} catch (err) {
 			console.error(err);
-			new Notice('Failed to save the database file.');
+			new Notice('❌ Error processing the database file.');
 		}
 
 		this.close();
