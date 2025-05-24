@@ -14,10 +14,10 @@ export function registerCommands(plugin: MyPlugin) {
 	});
 
 	plugin.addCommand({
-		id: 'Sync the vocabulary builder to your Obsidian',
+		id: 'sync-vocab',
 		name: 'Sync the vocabulary builder to your Obsidian',
 		callback: () => {
-			new SyncDatabaseModal(this.app).open();
+			new SyncDatabaseModal(plugin.app, plugin).open();
 		}
 	});
 

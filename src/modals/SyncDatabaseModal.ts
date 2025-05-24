@@ -2,13 +2,19 @@ import { App, Modal, Notice, ButtonComponent, normalizePath, TFile } from 'obsid
 import * as Papa from 'papaparse';
 import initSqlJs from 'sql.js/dist/sql-wasm.js';
 import { getVocabDbPath, getDictionaryCsvPath } from '../utils/PathHelper';
+import { generateMarkdown, setupCheckboxListeners } from '../utils/MarkdownFormat';
+import MyPlugin from '../main';
+
 
 export class SyncDatabaseModal extends Modal {
-	constructor(app: App) {
+	plugin: MyPlugin;
+
+	constructor(app: App, plugin: MyPlugin) {
 		super(app);
+		this.plugin = plugin;
 	}
 
-	onOpen() {
+	onOpen() {	
 		const { contentEl } = this;
 		contentEl.empty();
 
@@ -31,11 +37,11 @@ export class SyncDatabaseModal extends Modal {
 			new Notice('Starting sync...');
 
 			const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}` });
-			const dbPath = getVocabDbPath();
+			const dbPath = this.plugin.settings?.vocabDbPath || getVocabDbPath();
 
 			if (!(await this.app.vault.adapter.exists(dbPath))) {
-				new Notice('❌ vocab.db not found.');
-				throw new Error('vocab.db file not found.');
+				new Notice('❌ Vocab file not found.');
+				throw new Error('Vocab file not found.');
 			}
 
 			const arrayBuffer = await this.app.vault.adapter.readBinary(dbPath);
@@ -84,7 +90,7 @@ export class SyncDatabaseModal extends Modal {
 			insertStmt.free();
 
 			// Optional: Sync dictionary CSV
-			const csvPath = getDictionaryCsvPath();
+			const csvPath = this.plugin.settings?.dictionaryCsvPath || getDictionaryCsvPath();
 			if (await this.app.vault.adapter.exists(csvPath)) {
 				const csvContent = await this.app.vault.adapter.read(csvPath);
 				const rows = await this.parseCsv(csvContent);
@@ -110,8 +116,20 @@ export class SyncDatabaseModal extends Modal {
 				throw new Error('MAIN table is empty.');
 			}
 
-			const markdown = this.formatMarkdown(result[0]);
-			const mdPath = normalizePath('My Vocabulary Builder.md');
+			// In syncDatabase(), replace this:
+			if (!this.plugin.settings) {
+				await this.plugin.loadSettings?.();
+			}
+			const sortOrder = this.plugin.settings?.sortOrder || 'timestamp';
+			console.log(`[DEBUG] sortOrder from settings: ${this.plugin.settings?.sortOrder}`);
+			console.log(`[DEBUG] sortOrder from settings: ${sortOrder}`);
+			const markdown = await generateMarkdown(db, sortOrder);
+
+
+			const folder = this.plugin.settings?.markdownFolderPath?.trim() || '';
+			const fileName = 'My Vocabulary Builder.md';
+			const mdPath = normalizePath(folder ? `${folder}/${fileName}` : fileName);
+
 			await this.app.vault.adapter.write(mdPath, markdown);
 
 			const updatedDb = db.export();
@@ -123,7 +141,14 @@ export class SyncDatabaseModal extends Modal {
 			const mdFile = this.app.vault.getAbstractFileByPath(mdPath);
 			if (mdFile instanceof TFile) {
 				await this.app.workspace.getLeaf(true).openFile(mdFile);
+
+				// Wait a bit to let DOM render, then bind listeners
+				setTimeout(() => {
+					setupCheckboxListeners(this.app);
+				}, 500);
 			}
+
+
 		} catch (err) {
 			console.error(err);
 			new Notice('❌ Sync failed. Check console for details.');
@@ -148,28 +173,6 @@ export class SyncDatabaseModal extends Modal {
 			}
 		}
 		return rows;
-	}
-
-	private formatMarkdown(result: any): string {
-		const { columns, values } = result;
-		let md = '# Recent Lookups\n\n';
-
-		if (!values.length) return md + '_(No entries found)_';
-
-		for (const row of values) {
-			const word = row[columns.indexOf('word')]?.toString().trim() || '(unknown)';
-			const context = row[columns.indexOf('context')]?.toString().trim() || '(none)';
-			const title = row[columns.indexOf('book_title')]?.toString().trim() || '(none)';
-			const info = row[columns.indexOf('information')]?.toString().trim() || '(none)';
-			const learned = row[columns.indexOf('learned')] === 1 ? '[ x ]' : '[ ]';
-
-			md += `## ${word}\n\n`;
-			md += `- **Context**: ${context}\n`;
-			md += `- **Book Title**: ${title}\n`;
-			md += `- **Learned**: ${learned}\n`;
-			md += `- **Definition**:\n\n${info}\n\n---\n`;
-		}
-		return md;
 	}
 
 	onClose() {

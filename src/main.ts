@@ -3,7 +3,7 @@ import { MyPluginSettings, DEFAULT_SETTINGS } from './settings/Settings';
 import { SampleSettingTab } from './settings/SettingTab';
 import { registerCommands } from './commands/CommandsHandlers';
 import { registerRibbons } from './ribbon/RibbonHandlers';
-import { loadStyles } from './styles/StyleLoader';
+import { setupCheckboxListeners } from './utils/MarkdownFormat';
 
 
 export default class MyPlugin extends Plugin {
@@ -12,8 +12,26 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		// Load styles
-		loadStyles();
+
+		console.log('[VocabPlugin] Plugin loaded');
+
+		// 1. Handle live file-open events
+		this.registerEvent(
+			this.app.workspace.on('file-open', () => {
+				console.log('[VocabPlugin] file-open triggered');
+				setTimeout(() => {
+					console.log('[VocabPlugin] calling setupCheckboxListeners from file-open');
+					setupCheckboxListeners(this.app);
+				}, 1000);
+			})
+		);
+
+		// 2. Manually bind in case file was already open
+		setTimeout(() => {
+			console.log('[VocabPlugin] manually calling setupCheckboxListeners after load');
+			setupCheckboxListeners(this.app);
+		}, 2000);
+
 		// Core logic
 		registerRibbons(this);
 		registerCommands(this);
@@ -21,6 +39,7 @@ export default class MyPlugin extends Plugin {
 		const statusBarItemEl = this.addStatusBarItem();
 		statusBarItemEl.setText('Status Bar Text');
 
+		// Register settings tab
 		this.addSettingTab(new SampleSettingTab(this.app, this));
 
 		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
@@ -28,6 +47,7 @@ export default class MyPlugin extends Plugin {
 		});
 
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+	
 	}
 
 	onunload() {

@@ -1,6 +1,8 @@
 import { App, PluginSettingTab, Setting, Notice, normalizePath } from 'obsidian';
 import MyPlugin from '../main';
 import { getVocabDbPath, getDictionaryCsvPath, getdatafolderPath } from '../utils/PathHelper';
+import { TFolder } from 'obsidian';
+
 
 export class SampleSettingTab extends PluginSettingTab {
 	plugin: MyPlugin;
@@ -53,7 +55,50 @@ export class SampleSettingTab extends PluginSettingTab {
 		
 		const dbCount = await this.countFiles('db');
 		containerEl.createEl('p', { text: `Vocab DBs managed internally: ${dbCount}` });
-				
+
+		// Setting: Sort Order
+		new Setting(containerEl)
+			.setName('Sort Order')
+			.setDesc('Choose how to sort your markdown file.')
+			.addDropdown(drop => {
+				drop
+					.addOption('timestamp', 'Newest First (Timestamp)')
+					.addOption('unlearned', 'Unlearned First')
+
+				// ✅ Ensure the dropdown reflects the current value
+				drop.setValue(this.plugin.settings.sortOrder || 'timestamp');
+
+				drop.onChange(async (value) => {
+					console.log('[DEBUG] Dropdown changed to:', value);
+					this.plugin.settings.sortOrder = value;
+					await this.plugin.saveSettings();
+					new Notice(`Sort order set to "${value}"`);
+				});
+			});
+
+		new Setting(containerEl)
+			.setName('Markdown Output Folder')
+			.setDesc('Choose the folder to save your markdown file.')
+			.addDropdown(drop => {
+				const folders = this.app.vault.getAllLoadedFiles()
+					.filter(f => f instanceof TFolder) as TFolder[];
+
+				const current = this.plugin.settings.markdownFolderPath || '';
+
+				// Add folders to dropdown
+				drop.addOption('', 'Vault root');
+				for (const folder of folders) {
+					drop.addOption(folder.path, folder.path);
+				}
+
+				drop.setValue(current);
+
+				drop.onChange(async (value) => {
+					this.plugin.settings.markdownFolderPath = value;
+					await this.plugin.saveSettings();
+					new Notice(`Markdown folder set to: ${value || 'Vault root'}`);
+				});
+			});
 	}
 
 	// Utility function: Count files in 'data/' folder with extension
