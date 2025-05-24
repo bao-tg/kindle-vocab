@@ -1,7 +1,7 @@
 # Kindle Vocabulary Sync Plugin for Obsidian
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
-[![Documentation](https://img.shields.io/badge/documentation-latest-blue.svg)](https://your-docs-link.com)
+[![Developers' documentation](https://img.shields.io/badge/developers-documentation-green.svg)](https://bao-tg.github.io/blog/Obsidian_Kindle_Vocab)
 
 **Kindle Vocabulary Sync** is a powerful Obsidian plugin that enables users to seamlessly import vocabulary lookups from Kindle devices and convert them into structured Markdown notes. Designed for lifelong learners, this tool helps build a personalized vocabulary library within Obsidian for review, study, and long-term retention.
 
@@ -15,6 +15,7 @@
 - Automatically generates a Markdown file summarizing your recent Kindle lookups.
 - One-click sync from within Obsidian.
 - Supports custom dictionary sources.
+- Mark a word as "Learned/Unlearned".
 
 ---
 
@@ -57,14 +58,6 @@ A: It will be automatically overwritten with the latest synced content.
 
 ---
 
-## For Developers
-
-[Developers' documentation](https://bao-tg.github.io/blog/Obsidian_Kindle_Vocab)
-
-Contributions are welcome! Please open an issue or submit a pull request if you have ideas or improvements.
-
----
-
 ## References
 
 - [Obsidian Plugin Developer Guide](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)  
@@ -77,7 +70,9 @@ Contributions are welcome! Please open an issue or submit a pull request if you 
 ## Future Features
 
 - Sync directly with Amazon accounts, removing the need to manually upload `vocab.db`.
-
+- Sync with Anki through Obsidian. There is a repository that directly syncs the vocab.db to Anki.
+- A system that allows the users to mark the word as "learned" or "unlearned".
+- Add IPA pronunciation.
 ---
 
 ## License
