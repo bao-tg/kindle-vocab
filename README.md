@@ -90,8 +90,7 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 ## Say Thanks
 
 If you found this plugin useful, you can support its development:
-
-[![Buy Me a Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-violet.png)](https://www.buymeacoffee.com/baotg)
+[![Buy Me a Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-violet.png)](https://www.buymeacoffee.com/baotg){ width=70 }
 
 ---
 
