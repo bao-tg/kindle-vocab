@@ -1,7 +1,7 @@
 # Kindle Vocabulary Sync Plugin for Obsidian
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
-[![Developer Docs](https://img.shields.io/badge/developers-documentation-green.svg)](https://bao-tg.github.io/blog/Obsidian_Kindle_Vocab)
+[![Developer Docs](https://img.shields.io/badge/developers-documentation-green.svg)](https://bao-tg.github.io/blog/obsidian-kindle-vocab)
 
 **Kindle Vocabulary Sync** is an Obsidian plugin that lets you import vocabulary lookups from your Kindle device and convert them into structured, interactive Markdown notes.
 
