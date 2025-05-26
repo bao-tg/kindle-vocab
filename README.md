@@ -1,9 +1,9 @@
-# Kindle Vocabulary Sync Plugin for Obsidian
+# Kindle Vocab Plugin for Obsidian
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
 [![Developer Docs](https://img.shields.io/badge/developers-documentation-green.svg)](https://bao-tg.github.io/blog/obsidian-kindle-vocab)
 
-**Kindle Vocab Plugin** is an Obsidian plugin that lets you import vocabulary lookups from your Kindle device and convert them into structured, interactive Markdown notes.
+**Kindle Vocab** is an Obsidian plugin that lets you import vocabulary lookups from your Kindle device and convert them into structured, interactive Markdown notes.
 
 > Ideal for learners who want to build a personal vocabulary library and review it directly within Obsidian.
 
@@ -23,7 +23,7 @@
 
 ## Installation
 
-Search for **“Kindle Vocab Plugin”** in the [Obsidian Plugin Store](https://obsidian.md/plugins) and install it.
+Search for **“Kindle Vocab”** in the [Obsidian Plugin Store](https://obsidian.md/plugins) and install it.
 
 ---
 
