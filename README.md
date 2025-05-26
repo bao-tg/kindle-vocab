@@ -44,14 +44,14 @@
   - You may upload a custom dictionary file, provided that it is in CSV format with the structure: `word, information`.
 - Run the command: **`Upload your dictionary file`**.
 
-> ℹ️ Note: Amazon dictionaries are DRM-protected and cannot be used. We use public alternatives like GCIDE/Webster.
+> ℹ️ Note: Amazon dictionaries are DRM-protected and cannot be used. We use public alternatives like GCIDE/Webster. The wiktionary.csv file is my customized version of the [Wiktionary](https://en.wiktionary.org/wiki/Wiktionary:Main_Page) data.
 
 ### 3. Sync and Review Vocabulary
 
 - Click the **Sync** icon in the ribbon (left sidebar)
 - In the modal popup, click **`Start Sync`**
 - A file `My Vocabulary Builder.md` will be created
-- Use checkboxes to track learning progress directly in Obsidian
+- Use checkboxes to track learning progress directly in Obsidian (Remember to change to preview mode, Ctrl + E, to use checkboxes)
 
 ---
 
@@ -90,7 +90,8 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 ## Say Thanks
 
 If you found this plugin useful, you can support its development:
-[![Buy Me a Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-violet.png)](https://www.buymeacoffee.com/baotg){ width=70 }
-
+<a href="https://www.buymeacoffee.com/baotg" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" width="140">
+</a>
 ---
 

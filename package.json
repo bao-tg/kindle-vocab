@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-kindle-vocab-plugin",
 	"version": "1.0.0",
-	"description": "This is a Obsidian plugin that generates Markdown file from your Kindle vocabulary builders, and put it in your Obsidian.",
+	"description": "Sync your Kindle vocabulary builders with Obsidian.",
 	"main": "src/main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
