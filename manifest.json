@@ -1,6 +1,6 @@
 {
 	"id": "kindle-vocab",
-	"name": "Kindle Vocab Plugin",
+	"name": "Kindle Vocab",
 	"version": "v1.0.0",
 	"description": "Sync your Kindle vocabulary builders with Obsidian.",
 	"author": "Truong Gia Bao",
