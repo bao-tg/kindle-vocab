@@ -1,78 +1,84 @@
 # Kindle Vocabulary Sync Plugin for Obsidian
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
-[![Developers' documentation](https://img.shields.io/badge/developers-documentation-green.svg)](https://bao-tg.github.io/blog/Obsidian_Kindle_Vocab)
+[![Developer Docs](https://img.shields.io/badge/developers-documentation-green.svg)](https://bao-tg.github.io/blog/Obsidian_Kindle_Vocab)
 
-**Kindle Vocabulary Sync** is a powerful Obsidian plugin that enables users to seamlessly import vocabulary lookups from Kindle devices and convert them into structured Markdown notes. Designed for lifelong learners, this tool helps build a personalized vocabulary library within Obsidian for review, study, and long-term retention.
+**Kindle Vocabulary Sync** is a powerful Obsidian plugin that allows users to seamlessly import vocabulary lookups from Kindle devices and convert them into structured, interactive Markdown notes.
 
-**Developed and maintained by:**  
-**Bao Truong**
+**Ideal for learners who want to build a personal vocabulary library and study words directly within Obsidian.**
+
+**Developed by:** [Bao Truong](https://github.com/bao-tg)
 
 ---
 
 ## Features
 
-- Automatically generates a Markdown file summarizing your recent Kindle lookups.
-- One-click sync from within Obsidian.
-- Supports custom dictionary sources.
-- Mark a word as "Learned/Unlearned".
+- Generate Markdown from your Kindle lookups (`vocab.db`)
+- Integrate your own dictionary files (CSV)
+- Mark words as "Learned/Unlearned" with checkbox interactivity
+- View stats like % learned
+- Sort words by timestamp or unlearned-first
 
 ---
 
 ## Installation
 
-1. Download the latest release of **Kindle Vocabulary Sync**.
-2. Place the plugin folder into your Obsidian vault under `.obsidian/plugins/`.
-3. Reload Obsidian and enable the plugin via **Settings → Community Plugins**.
+1. Search for **“Kindle Vocabulary Sync”** in the [Obsidian Plugin Store](https://obsidian.md/plugins) and install it  
+   — or —
+2. Clone this repository and place it in your local `.obsidian/plugins/` folder.
 
 ---
 
 ## How to Use
 
-1. Open the command palette and run **"Upload your vocabulary database"**.  
-   Upload your Kindle `vocab.db` file (retrieved by connecting your Kindle to your computer).
+### 1. Upload Your Vocabulary Database
 
-![Image 1](image/image.png)
+- Run the command: **`Upload your vocabulary database`**
+- Select your `vocab.db` file (usually found in `Kindle/system/vocabulary/`)
 
-2. Download the dictionary file here:  
-   📘 [websters-dictionary.csv](https://drive.google.com/file/d/1HV95XUzdCYExa1_eXrRbHHtCk4itSlYJ/view?usp=sharing)  
-   _Note: Amazon's dictionary is DRM-protected ([read more](https://learn.microsoft.com/vi-vn/windows-hardware/drivers/audio/digital-rights-management)), so we use a public alternative._
-3. Run **"Upload your dictionary file"** and select the downloaded `websters-dictionary.csv`.
-4. Click the **Sync** icon in the left sidebar ribbon.
-5. In the modal popup, click **Start Sync**.
+### 2. Upload a Dictionary File (CSV)
 
-![Image 2](image/image-1.png)
+- Download a public dictionary file:
+  - 📘 [Webster’s Dictionary CSV](https://github.com/matthewreagan/WebstersEnglishDictionary).
+  - 🧠 [wiktionary.csv](https://drive.google.com/file/d/1yyfdPqF0jJ7Y54PPgLq4_sS0SgJ8p537/view?usp=sharing). 
+  - You may upload a custom dictionary file, provided that it is in CSV format with the structure: `word, information`.
+- Run the command: **`Upload your dictionary file`**.
 
-6. A new file named `My Vocabulary Builder.md` will be generated containing your lookups and definitions.
-7. Review, edit, and study your vocabulary directly in Obsidian.
+> ℹ️ Note: Amazon dictionaries are DRM-protected and cannot be used. We use public alternatives like GCIDE/Webster.
 
----
+### 3. Sync and Review Vocabulary
 
-## FAQ
-
-**Q: Can I use my own dictionary file?**  
-A: Yes. You can update the dictionary path in Settings. Make sure the file follows the `[word, definition]` format.
-
-**Q: What happens if I already have a `My Vocabulary Builder.md` file?**  
-A: It will be automatically overwritten with the latest synced content.
+- Click the **Sync** icon in the ribbon (left sidebar)
+- In the modal popup, click **`Start Sync`**
+- A file `My Vocabulary Builder.md` will be created
+- Use checkboxes to track learning progress directly in Obsidian
 
 ---
 
 ## References
 
-- [Obsidian Plugin Developer Guide](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)  
-- [GCIDE: GNU Collaborative International Dictionary of English](https://gcide.gnu.org.ua/)  
-- [Webster’s Dictionary CSV on GitHub](https://github.com/matthewreagan/WebstersEnglishDictionary)  
-- [Microsoft Docs on DRM](https://learn.microsoft.com/vi-vn/windows-hardware/drivers/audio/digital-rights-management)
+- [Obsidian Plugin Developer Guide](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
+- [GCIDE Dictionary](https://gcide.gnu.org.ua/)
+- [Webster’s Dictionary CSV](https://github.com/matthewreagan/WebstersEnglishDictionary)
+- [Wiktionary](https://en.wiktionary.org/wiki/Wiktionary:Main_Page)
+- [Microsoft Docs – DRM](https://learn.microsoft.com/vi-vn/windows-hardware/drivers/audio/digital-rights-management)
 
 ---
 
-## Future Features
+## Additional Tools
 
-- Sync directly with Amazon accounts, removing the need to manually upload `vocab.db`.
-- Sync with Anki through Obsidian. There is a repository that directly syncs the vocab.db to Anki.
-- A system that allows the users to mark the word as "learned" or "unlearned".
-- Add IPA pronunciation.
+Want to sync directly to Anki?  
+See this repo: [KindleVocab2Anki](https://github.com/wzyboy/kindle_vocab_anki)
+
+> ⚠️ Note: It may require deDRM, which is legally sensitive in some regions.
+
+---
+
+## FAQ
+
+**Q: Can I log in with my Amazon account and auto-sync the vocab.db?**  
+**A:** No. You need to manually upload the file. Amazon does not provide an API or allow direct sync access.
+
 ---
 
 ## License
@@ -83,8 +89,9 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 
 ## Say Thanks
 
-If you like this plugin and would like to support its development, you can:
+If you found this plugin useful, you can support its development:
 
-<a href="https://www.buymeacoffee.com/baotg" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" width="140">
-</a>
+[![Buy Me a Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-violet.png)](https://www.buymeacoffee.com/baotg)
+
+---
+
