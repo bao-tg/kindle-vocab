@@ -23,7 +23,7 @@
 
 ## Installation
 
-Search for **“Kindle Vocabulary Sync”** in the [Obsidian Plugin Store](https://obsidian.md/plugins) and install it.
+Search for **“Kindle Vocab Plugin”** in the [Obsidian Plugin Store](https://obsidian.md/plugins) and install it.
 
 ---
 
