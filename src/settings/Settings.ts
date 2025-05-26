@@ -1,11 +1,9 @@
 export interface MyPluginSettings {
-	vocabDbPath: string;
-	dictionaryCsvPath: string;
 	sortOrder: string;
+	markdownFolderPath: string;
 }
 
 export const DEFAULT_SETTINGS: MyPluginSettings = {
-	vocabDbPath: '',
-	dictionaryCsvPath: '',
 	sortOrder: 'timestamp',
+	markdownFolderPath: '',
 };

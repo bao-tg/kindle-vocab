@@ -1,12 +1,11 @@
 import { App, Modal, Notice, ButtonComponent, normalizePath } from 'obsidian';
-import initSqlJs from 'sql.js/dist/sql-wasm.js'; // ✅ This ensures wasm build is compatible
-
+import initSqlJs from 'sql.js/dist/sql-wasm.js';
 
 export class DatabaseUploadModal extends Modal {
 	private fileInputEl: HTMLInputElement;
-	private allowedExtensions: Set<string> = new Set(['db', 'sqlite', 'db3']);
-	private targetFolder: string = '.obsidian/plugins/obsidian-kindle-vocab-plugin/src/data'; // Save here
-	private targetFileName: string = 'vocab.db'; // Save as
+	private readonly allowedExtensions = new Set(['db', 'sqlite', 'db3']);
+	private readonly targetFolder = '.obsidian/plugins/obsidian-kindle-vocab-plugin/src/data';
+	private readonly targetFileName = 'vocab.db';
 
 	constructor(app: App) {
 		super(app);
@@ -14,14 +13,13 @@ export class DatabaseUploadModal extends Modal {
 
 	onOpen() {
 		const { contentEl } = this;
+		contentEl.empty();
 
-		contentEl.createEl('h2', { text: 'Upload a Vocabulary file (DB)' });
+		contentEl.createEl('h2', { text: 'Upload a Vocabulary File (DB)' });
 
 		this.fileInputEl = contentEl.createEl('input', {
 			type: 'file',
-			attr: {
-				accept: '.db,.sqlite,.db3',
-			}
+			attr: { accept: '.db,.sqlite,.db3' },
 		});
 
 		new ButtonComponent(contentEl)
@@ -43,66 +41,69 @@ export class DatabaseUploadModal extends Modal {
 
 		const file = files[0];
 		const extension = file.name.split('.').pop()?.toLowerCase() || '';
-
 		if (!this.allowedExtensions.has(extension)) {
 			new Notice('Invalid file type. Please upload a valid database file.');
 			return;
 		}
 
 		try {
-			const arrayBuffer = await file.arrayBuffer();
-			const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/sql-wasm.wasm` });
+			const buffer = new Uint8Array(await file.arrayBuffer());
+			const SQL = await initSqlJs({
+				locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
+			});
 
 			const vault = this.app.vault;
 			const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
-			const currentExists = await vault.adapter.exists(filePath);
 
-			if (!currentExists) {
-				// ✅ File doesn't exist → directly save the uploaded file
-				await this.saveFile(new Uint8Array(arrayBuffer));
+			const fileExists = await vault.adapter.exists(filePath);
+			if (!fileExists) {
+				await this.saveFile(buffer);
 				new Notice('✅ vocab.db uploaded successfully.');
 			} else {
-				// ✅ File exists → merge all tables except "dictionary"
-				const currentDBData = await vault.adapter.readBinary(filePath);
-				const currentDB = new SQL.Database(new Uint8Array(currentDBData));
-				const newDB = new SQL.Database(new Uint8Array(arrayBuffer));
-
-				const res = newDB.exec(`SELECT name FROM sqlite_master WHERE type='table';`);
-				const newTables = res[0].values.map(row => row[0]).filter(name => name !== 'MAIN');
-
-				for (const tableName of newTables) {
-					const tableSQLs = newDB.exec(`SELECT sql FROM sqlite_master WHERE type='table' AND name='${tableName}'`);
-					if (tableSQLs.length > 0) {
-						const createSQL = tableSQLs[0].values[0][0];
-						currentDB.run(`DROP TABLE IF EXISTS ${tableName};`);
-						if (typeof createSQL === 'string') {
-							currentDB.run(createSQL);
-						}
-
-						const rows = newDB.exec(`SELECT * FROM ${tableName}`);
-						if (rows.length > 0) {
-							const columns = rows[0].columns;
-							for (const row of rows[0].values) {
-								const placeholders = row.map(() => '?').join(', ');
-								currentDB.run(
-									`INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${placeholders});`,
-									row
-								);
-							}
-						}
-					}
-				}
-
-				const mergedData = currentDB.export();
-				await this.saveFile(new Uint8Array(mergedData));
-				new Notice('✅ Database updated (excluding dictionary table).');
+				await this.mergeDatabases(SQL, filePath, buffer);
+				new Notice('✅ Database updated (excluding MAIN table).');
 			}
 		} catch (err) {
 			console.error(err);
 			new Notice('❌ Error processing the database file.');
+		} finally {
+			this.close();
+		}
+	}
+
+	private async mergeDatabases(SQL: any, filePath: string, newData: Uint8Array) {
+		const vault = this.app.vault;
+		const currentData = await vault.adapter.readBinary(filePath);
+		const currentDB = new SQL.Database(new Uint8Array(currentData));
+		const newDB = new SQL.Database(newData);
+
+		const tablesRes = newDB.exec(`SELECT name FROM sqlite_master WHERE type='table';`);
+		const newTables = tablesRes?.[0]?.values?.map((row: any[]) => row[0]).filter((name: string) => name !== 'MAIN') || [];
+
+		for (const tableName of newTables) {
+			// Drop and recreate table
+			const createSQL = newDB.exec(`SELECT sql FROM sqlite_master WHERE name='${tableName}' AND type='table';`);
+			if (createSQL.length === 0) continue;
+
+			currentDB.run(`DROP TABLE IF EXISTS ${tableName};`);
+			currentDB.run(createSQL[0].values[0][0]);
+
+			// Copy rows
+			const rowsRes = newDB.exec(`SELECT * FROM ${tableName};`);
+			if (rowsRes.length === 0) continue;
+
+			const { columns, values } = rowsRes[0];
+			for (const row of values) {
+				const placeholders = row.map(() => '?').join(', ');
+				currentDB.run(
+					`INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${placeholders});`,
+					row
+				);
+			}
 		}
 
-		this.close();
+		const mergedData = currentDB.export();
+		await this.saveFile(new Uint8Array(mergedData));
 	}
 
 	private async saveFile(data: Uint8Array) {
@@ -111,24 +112,30 @@ export class DatabaseUploadModal extends Modal {
 		const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
 
 		// Ensure folder exists
-		const folderExists = await vault.adapter.exists(folderPath);
-		if (!folderExists) {
-			await vault.createFolder(folderPath);
+		if (!(await vault.adapter.exists(folderPath))) {
+			await this.createFolderRecursively(folderPath);
 		}
 
-		// If file already exists, delete it first (optional)
-		const fileExists = await vault.adapter.exists(filePath);
-		if (fileExists) {
+		// Remove old file
+		if (await vault.adapter.exists(filePath)) {
 			await vault.adapter.remove(filePath);
 		}
 
-		// Create file
 		await vault.createBinary(filePath, data);
 	}
-	
+
+	private async createFolderRecursively(path: string) {
+		const parts = path.split('/');
+		let currentPath = '';
+		for (const part of parts) {
+			currentPath = normalizePath(`${currentPath}/${part}`);
+			if (!(await this.app.vault.adapter.exists(currentPath))) {
+				await this.app.vault.createFolder(currentPath);
+			}
+		}
+	}
 
 	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
+		this.contentEl.empty();
 	}
 }

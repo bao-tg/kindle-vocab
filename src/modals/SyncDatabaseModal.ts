@@ -5,7 +5,6 @@ import { getVocabDbPath, getDictionaryCsvPath } from '../utils/PathHelper';
 import { generateMarkdown, setupCheckboxListeners } from '../utils/MarkdownFormat';
 import MyPlugin from '../main';
 
-
 export class SyncDatabaseModal extends Modal {
 	plugin: MyPlugin;
 
@@ -14,18 +13,16 @@ export class SyncDatabaseModal extends Modal {
 		this.plugin = plugin;
 	}
 
-	onOpen() {	
+	onOpen() {
 		const { contentEl } = this;
 		contentEl.empty();
 
 		contentEl.createEl('h2', { text: 'Sync Your Vocabulary Builder' });
-
 		contentEl.createEl('p', {
 			text: 'This will synchronize your Kindle lookups and create a markdown summary. Make sure your vocab database and dictionary file are ready.'
 		});
 
 		const buttonContainer = contentEl.createDiv({ cls: 'sync-button-container' });
-
 		new ButtonComponent(buttonContainer)
 			.setButtonText('🔄 Start Sync')
 			.setCta()
@@ -36,18 +33,18 @@ export class SyncDatabaseModal extends Modal {
 		try {
 			new Notice('Starting sync...');
 
+			// Load vocab DB
 			const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}` });
-			const dbPath = this.plugin.settings?.vocabDbPath || getVocabDbPath();
+			const dbPath = getVocabDbPath();
 
 			if (!(await this.app.vault.adapter.exists(dbPath))) {
-				new Notice('❌ Vocab file not found.');
-				throw new Error('Vocab file not found.');
+				throw new Error('❌ Vocab file not found.');
 			}
 
 			const arrayBuffer = await this.app.vault.adapter.readBinary(dbPath);
 			const db = new SQL.Database(new Uint8Array(arrayBuffer));
 
-			// Create MAIN if not exists
+			// Ensure MAIN table exists
 			db.run(`
 				CREATE TABLE IF NOT EXISTS MAIN (
 					word TEXT PRIMARY KEY,
@@ -58,15 +55,15 @@ export class SyncDatabaseModal extends Modal {
 				)
 			`);
 
-			// Pull Kindle lookups
+			// Extract Kindle lookup data
 			const lookupData = db.exec(`
 				SELECT w.word, l.usage, bi.title
 				FROM LOOKUPS l
 				JOIN WORDS w ON l.word_key = w.id
 				JOIN BOOK_INFO bi ON l.book_key = bi.id
 			`);
-			const lookupRows = lookupData.length ? lookupData[0].values : [];
 
+			const lookupRows = lookupData.length ? lookupData[0].values : [];
 			let newWordCount = 0;
 
 			const checkExistsStmt = db.prepare(`SELECT 1 FROM MAIN WHERE word = ?`);
@@ -77,7 +74,6 @@ export class SyncDatabaseModal extends Modal {
 
 			for (const [word, context, bookTitle] of lookupRows) {
 				if (!word) continue;
-
 				checkExistsStmt.bind([word]);
 				if (!checkExistsStmt.step()) {
 					insertStmt.run([word, context || '', bookTitle || '']);
@@ -89,69 +85,46 @@ export class SyncDatabaseModal extends Modal {
 			checkExistsStmt.free();
 			insertStmt.free();
 
-			// Optional: Sync dictionary CSV
-			const csvPath = this.plugin.settings?.dictionaryCsvPath || getDictionaryCsvPath();
+			// Optional: sync dictionary info from CSV
+			const csvPath = getDictionaryCsvPath();
 			if (await this.app.vault.adapter.exists(csvPath)) {
 				const csvContent = await this.app.vault.adapter.read(csvPath);
 				const rows = await this.parseCsv(csvContent);
 
-				const updateInfoStmt = db.prepare(`
-					UPDATE MAIN SET information = ? WHERE word = ?
-				`);
+				const updateInfoStmt = db.prepare(`UPDATE MAIN SET information = ? WHERE word = ?`);
 				for (const [word, info] of rows) {
 					updateInfoStmt.run([info, word]);
 				}
 				updateInfoStmt.free();
 			}
 
-			// Generate Markdown
-			const result = db.exec(`
-				SELECT word, context, book_title, information, learned
-				FROM MAIN
-				ORDER BY rowid DESC
-			`);
-
-			if (result.length === 0 || result[0].values.length === 0) {
-				new Notice('⚠️ No data to sync.');
-				throw new Error('MAIN table is empty.');
-			}
-
-			// In syncDatabase(), replace this:
-			if (!this.plugin.settings) {
-				await this.plugin.loadSettings?.();
-			}
+			// Load settings and generate markdown
+			if (!this.plugin.settings) await this.plugin.loadSettings?.();
 			const sortOrder = this.plugin.settings?.sortOrder || 'timestamp';
-			console.log(`[DEBUG] sortOrder from settings: ${this.plugin.settings?.sortOrder}`);
-			console.log(`[DEBUG] sortOrder from settings: ${sortOrder}`);
 			const markdown = await generateMarkdown(db, sortOrder);
 
-
+			// Write markdown to file
 			const folder = this.plugin.settings?.markdownFolderPath?.trim() || '';
 			const fileName = 'My Vocabulary Builder.md';
 			const mdPath = normalizePath(folder ? `${folder}/${fileName}` : fileName);
-
 			await this.app.vault.adapter.write(mdPath, markdown);
 
+			// Save updated DB
 			const updatedDb = db.export();
 			await this.app.vault.adapter.writeBinary(dbPath, updatedDb);
 			db.close();
 
 			new Notice(`✅ Sync complete! ${newWordCount} new word(s) added.`);
 
+			// Open markdown file
 			const mdFile = this.app.vault.getAbstractFileByPath(mdPath);
 			if (mdFile instanceof TFile) {
 				await this.app.workspace.getLeaf(true).openFile(mdFile);
-
-				// Wait a bit to let DOM render, then bind listeners
-				setTimeout(() => {
-					setupCheckboxListeners(this.app);
-				}, 500);
+				setTimeout(() => setupCheckboxListeners(this.app), 500);
 			}
-
-
 		} catch (err) {
 			console.error(err);
-			new Notice('❌ Sync failed. Check console for details.');
+			new Notice((err as Error).message || '❌ Sync failed. Check console for details.');
 		} finally {
 			this.close();
 		}
@@ -167,9 +140,7 @@ export class SyncDatabaseModal extends Modal {
 		for (let i = 1; i < parsed.data.length; i++) {
 			const row = parsed.data[i];
 			if (row.length >= 2) {
-				const word = row[0].trim();
-				const info = row[1].trim();
-				rows.push([word, info]);
+				rows.push([row[0].trim(), row[1].trim()]);
 			}
 		}
 		return rows;

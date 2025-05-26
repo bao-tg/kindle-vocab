@@ -8,10 +8,6 @@ export function getDictionaryCsvPath(): string {
 	return normalizePath('.obsidian/plugins/obsidian-kindle-vocab-plugin/src/data/dictionary.csv');
 }
 
-export function getStyleCssPath(): string {
-	return normalizePath('.obsidian/plugins/obsidian-kindle-vocab-plugin/src/styles/styles.css');
-}
-
 export function getdatafolderPath(): string {
 	return normalizePath('.obsidian/plugins/obsidian-kindle-vocab-plugin/src/data');
 }
