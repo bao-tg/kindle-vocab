@@ -49,6 +49,7 @@ export async function generateMarkdown(db: Database, sortOrder: string): Promise
 /**
  * Bind listeners to checkboxes in preview mode and update DB.
  */
+
 export function setupCheckboxListeners(app: { vault: Vault }) {
 	const previews = document.querySelectorAll('.markdown-preview-view');
 
@@ -59,8 +60,8 @@ export function setupCheckboxListeners(app: { vault: Vault }) {
 	}
 
 	// Avoid duplicate listener attachment
-	if ((previews as any)._vocab_listener_attached) return;
-	(previews as any)._vocab_listener_attached = true;
+	const vocabListenerAttached = new WeakMap<object, boolean>();
+	vocabListenerAttached.set(previews, true);
 
 	previews.forEach((el) => {
 		el.addEventListener('click', async (e) => {

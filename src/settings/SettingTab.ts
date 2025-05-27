@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting, Notice, normalizePath, TFolder } from 'obsidian';
 import MyPlugin from '../main';
 
-export class SampleSettingTab extends PluginSettingTab {
+export class KindleVocabSettingTab extends PluginSettingTab {
 	plugin: MyPlugin;
 
 	constructor(app: App, plugin: MyPlugin) {
@@ -37,8 +37,9 @@ export class SampleSettingTab extends PluginSettingTab {
 			.setName('Markdown Output Folder')
 			.setDesc('Choose the folder to save your markdown file.')
 			.addDropdown(drop => {
-				const folders = this.app.vault.getAllLoadedFiles()
-					.filter(f => f instanceof TFolder) as TFolder[];
+				const folders = this.app.vault.getAllLoadedFiles().filter(
+					(f): f is TFolder => f instanceof TFolder
+					);
 
 				const current = this.plugin.settings.markdownFolderPath || '';
 
@@ -71,11 +72,9 @@ export class SampleSettingTab extends PluginSettingTab {
 			attr: {
 				src: 'https://cdn.buymeacoffee.com/buttons/v2/default-violet.png',
 				alt: 'Buy Me a Coffee',
+				width: '120',
+				height: '35'
 			}
 		});
-		img.style.height = '40px';
-		img.style.borderRadius = '8px';
-		img.style.marginTop = '1px';
-		img.style.marginBottom = '1px';
 	}
 }

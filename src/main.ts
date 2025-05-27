@@ -1,12 +1,12 @@
 import { Plugin, Notice } from 'obsidian';
-import { MyPluginSettings, DEFAULT_SETTINGS } from './settings/Settings';
-import { SampleSettingTab } from './settings/SettingTab';
+import { KindleVocabSettings, DEFAULT_SETTINGS } from './settings/Settings';
+import { KindleVocabSettingTab } from './settings/SettingTab';
 import { registerCommands } from './commands/CommandsHandlers';
 import { registerRibbons } from './ribbon/RibbonHandlers';
 import { setupCheckboxListeners } from './utils/MarkdownFormat';
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class KindleVocabPlugin extends Plugin {
+	settings: KindleVocabSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -29,7 +29,7 @@ export default class MyPlugin extends Plugin {
 		this.addStatusBarItem().setText('Status Bar Text');
 
 		// 📌 Add settings tab
-		this.addSettingTab(new SampleSettingTab(this.app, this));
+		this.addSettingTab(new KindleVocabSettingTab(this.app, this));
 	}
 
 	onunload() {

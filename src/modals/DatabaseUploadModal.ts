@@ -4,7 +4,7 @@ import initSqlJs from 'sql.js/dist/sql-wasm.js';
 export class DatabaseUploadModal extends Modal {
 	private fileInputEl: HTMLInputElement;
 	private readonly allowedExtensions = new Set(['db', 'sqlite', 'db3']);
-	private readonly targetFolder = '.obsidian/plugins/obsidian-kindle-vocab-plugin/src/data';
+	private readonly targetFolder = `${this.app.vault.configDir}/plugins/obsidian-kindle-vocab-plugin/src/data`;
 	private readonly targetFileName = 'vocab.db';
 
 	constructor(app: App) {
