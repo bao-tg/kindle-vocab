@@ -21,10 +21,35 @@
 
 ---
 
-## Installation
+## Installation Guide
 
-Search for **“Kindle Vocab”** in the [Obsidian Plugin Store](https://obsidian.md/plugins) and install it.
+### For Normal Users  
+> Currently pending approval on the Obsidian Plugin Store.
 
+Once approved, you can simply:  
+1. Open **Settings → Community Plugins** in Obsidian.  
+2. Search for **“Kindle Vocab”**.  
+3. Click **Install**, then **Enable** the plugin.
+
+🔗 [Approval status (Obsidian PR #6510)](https://github.com/obsidianmd/obsidian-releases/pull/6510)
+
+---
+
+### 🛠️ For Developers / Early Access
+
+**Warning**: Please **backup your vault** before proceeding.
+
+To install the plugin manually:
+
+```bash
+cd path/to/your-vault/.obsidian/plugins
+git clone https://github.com/bao-tg/kindle-vocab
+cd kindle-vocab
+npm install
+npm run dev
+```
+
+> Alternatively, you can just download the `main.js` and `manifest.json` files and place them in a new `kindle-vocab` folder under `.obsidian/plugins/`.
 ---
 
 ## How to Use
