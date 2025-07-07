@@ -3,7 +3,7 @@ import { App, Modal, Notice, ButtonComponent, normalizePath, TFile } from 'obsid
 export class DictionaryUploadModal extends Modal {
 	private fileInputEl: HTMLInputElement;
 	private readonly allowedExtensions = new Set(['csv']);
-	private readonly targetFolder = `${this.app.vault.configDir}/plugins/obsidian-kindle-vocab-plugin/src/data`;
+	private readonly targetFolder = `${this.app.vault.configDir}/plugins/kindle-vocab/src/data`;
 	private readonly targetFileName = 'dictionary.csv';
 
 	constructor(app: App) {

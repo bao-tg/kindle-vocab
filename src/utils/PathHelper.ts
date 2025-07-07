@@ -1,15 +1,15 @@
 import { normalizePath } from 'obsidian';
 
 export function getVocabDbPath(): string {
-	return normalizePath(`${this.app.vault.configDir}/plugins/obsidian-kindle-vocab-plugin/src/data/vocab.db`);
+	return normalizePath(`${this.app.vault.configDir}/plugins/kindle-vocab/src/data/vocab.db`);
 }
 
 export function getDictionaryCsvPath(): string {
-	return normalizePath(`${this.app.vault.configDir}/plugins/obsidian-kindle-vocab-plugin/src/data/dictionary.csv`);
+	return normalizePath(`${this.app.vault.configDir}/plugins/kindle-vocab/src/data/dictionary.csv`);
 }
 
 export function getdatafolderPath(): string {
-	return normalizePath(`${this.app.vault.configDir}/plugins/obsidian-kindle-vocab-plugin/src/data`);
+	return normalizePath(`${this.app.vault.configDir}/plugins/kindle-vocab/src/data`);
 }
 
 export function getMarkdownOutputPath(): string {
