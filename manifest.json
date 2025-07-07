@@ -6,6 +6,5 @@
 	"author": "Truong Gia Bao",
 	"authorUrl": "https://github.com/bao-tg",
 	"minAppVersion": "1.0.0",
-	"isDesktopOnly": true,
-	"main": "main.js"  
+	"isDesktopOnly": true
   }
