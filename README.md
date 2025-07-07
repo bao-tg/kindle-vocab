@@ -42,7 +42,7 @@ Once approved, you can simply:
 To install the plugin manually:
 
 ```bash
-cd path/to/your-vault/.obsidian/plugins
+cd path/to/your-vault/.obsidian/plugins // If there is no `plugins` directory, create it
 git clone https://github.com/bao-tg/kindle-vocab
 cd kindle-vocab
 npm install
@@ -121,6 +121,13 @@ Check out: [KindleVocab2Anki](https://github.com/wzyboy/kindle_vocab_anki)
 ## License
 
 This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
+---
+
+## Future developments
+
++ Support other languages beside English
++ Better customized dictionary
 
 ---
 
