@@ -32,15 +32,17 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 				});
 			});
 
+		function isTFolder(f: any): f is TFolder {
+				return f instanceof TFolder;
+			}
+
 		// Setting: Markdown Output Folder
 		new Setting(containerEl)
 			.setName('Markdown Output Folder')
 			.setDesc('Choose the folder to save your markdown file.')
 			.addDropdown(drop => {
-				const folders = this.app.vault.getAllLoadedFiles().filter(
-					(f): f is TFolder => f instanceof TFolder
-					);
 
+				const folders = this.app.vault.getAllLoadedFiles().filter(isTFolder);
 				const current = this.plugin.settings.markdownFolderPath || '';
 
 				drop.addOption('', 'Vault root');
