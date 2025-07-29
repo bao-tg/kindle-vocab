@@ -1,8 +1,8 @@
+import { get } from 'http';
 import { App, Modal, Notice, ButtonComponent, normalizePath } from 'obsidian';
 import initSqlJs from 'sql.js/dist/sql-wasm.js';
 import KindleVocabPlugin from 'src/main';
 import { getAssetsFolderPath } from 'src/utils/PathHelper';
-// Remove direct import of wasmBinary; we'll fetch it at runtime instead.
 
 export class DatabaseUploadModal extends Modal {
 	constructor(app: App, private plugin: KindleVocabPlugin) {
@@ -14,11 +14,11 @@ export class DatabaseUploadModal extends Modal {
 	private readonly allowedExtensions = new Set(['db', 'sqlite', 'db3']);
 	private readonly targetFileName = 'vocab.db';
 	private targetFolder = getAssetsFolderPath(this.plugin);
-	
 
 	async onOpen() {
 		const { contentEl } = this;
 		
+		// Load settings if not already done
 		contentEl.empty();
 
 		contentEl.createEl('h2', { text: 'Upload a Vocabulary File (DB)' });
@@ -54,12 +54,10 @@ export class DatabaseUploadModal extends Modal {
 
 		try {
 			const buffer = new Uint8Array(await file.arrayBuffer());
-			// Dynamically fetch the wasm binary at runtime
-			const wasmResponse = await fetch('sql.js/dist/sql-wasm.wasm');
-			const wasmBinary = await wasmResponse.arrayBuffer();
 			const SQL = await initSqlJs({
-				wasmBinary
-			});
+					locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
+				});
+
 			const vault = this.app.vault;
 			const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
 

@@ -18,7 +18,6 @@ export function registerCheckboxPostProcessor(plugin: KindleVocabPlugin) {
 						locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
 					});
 					// Load settings
-					if (!this.plugin.settings) await this.plugin.loadSettings?.();
 					const dbPath = getVocabDbPath(plugin);
 					const data = await plugin.app.vault.adapter.readBinary(dbPath);
 					const db = new SQL.Database(new Uint8Array(data));

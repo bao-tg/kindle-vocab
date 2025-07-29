@@ -6,7 +6,7 @@ export interface KindleVocabSettings {
 
 export const DEFAULT_SETTINGS: KindleVocabSettings = {
 	sortOrder: 'timestamp',
-	markdownFolderPath: 'kindle-vocab/My Vocabulary Builder.md',
+	markdownFolderPath: 'kindle-vocab',
 	assetsFolderPath: 'kindle-vocab/assets', 
 };
 

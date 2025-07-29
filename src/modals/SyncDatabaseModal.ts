@@ -98,7 +98,6 @@ export class SyncDatabaseModal extends Modal {
 			}
 
 			// Load settings and generate markdown
-			if (!this.plugin.settings) await this.plugin.loadSettings?.();
 			const sortOrder = this.plugin.settings?.sortOrder || 'timestamp';
 			const markdown = await generateMarkdown(db, sortOrder);
 
