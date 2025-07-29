@@ -14,7 +14,9 @@ export function registerCheckboxPostProcessor(plugin: KindleVocabPlugin) {
 				const isLearned = input.checked ? 1 : 0;
 
 				try {
-					const SQL = await initSqlJs({ locateFile: file => `../../sql/${file}` });
+					const SQL = await initSqlJs({
+						locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
+					});
 					// Load settings
 					if (!this.plugin.settings) await this.plugin.loadSettings?.();
 					const dbPath = getVocabDbPath(plugin);

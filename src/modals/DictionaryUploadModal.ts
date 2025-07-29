@@ -17,8 +17,6 @@ export class DictionaryUploadModal extends Modal {
 		const { contentEl } = this;
 
 		// Load settings if not already done
-		if (!this.plugin.settings) await this.plugin.loadSettings();
-
 		contentEl.empty();
 
 		contentEl.createEl('h2', { text: 'Upload a Dictionary File (CSV)' });

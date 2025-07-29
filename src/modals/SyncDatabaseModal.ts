@@ -31,7 +31,9 @@ export class SyncDatabaseModal extends Modal {
 			new Notice('Starting sync...');
 
 			// Load vocab DB
-			const SQL = await initSqlJs({ locateFile: file => `../../sql/${file}` });
+			const SQL = await initSqlJs({
+					locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
+				});
 			const dbPath = getVocabDbPath(this.plugin);
 
 			if (!(await this.app.vault.adapter.exists(dbPath))) {
