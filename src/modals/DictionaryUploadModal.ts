@@ -18,8 +18,6 @@ export class DictionaryUploadModal extends Modal {
 
 		// Load settings if not already done
 		if (!this.plugin.settings) await this.plugin.loadSettings();
-		console.log('Plugin settings:', this.plugin.settings);
-
 
 		contentEl.empty();
 
@@ -46,8 +44,6 @@ export class DictionaryUploadModal extends Modal {
 			new Notice('No file selected.');
 			return;
 		}
-
-		console.log('Target folder:', this.targetFolder);
 
 		const file = files[0];
 		const extension = file.name.split('.').pop()?.toLowerCase() || '';
@@ -79,8 +75,6 @@ export class DictionaryUploadModal extends Modal {
 		const vault = this.app.vault;
 		const folderPath = normalizePath(this.targetFolder);
 		const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
-
-		console.log('Saving file to:', filePath);
 
 		// Ensure folder exists (create recursively if needed)
 		if (!(await vault.adapter.exists(folderPath))) {
