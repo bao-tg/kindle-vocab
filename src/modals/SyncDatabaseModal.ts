@@ -2,15 +2,12 @@ import { App, Modal, Notice, ButtonComponent, normalizePath, TFile } from 'obsid
 import * as Papa from 'papaparse';
 import initSqlJs from 'sql.js/dist/sql-wasm.js';
 import { getVocabDbPath, getDictionaryCsvPath } from '../utils/PathHelper';
-import { generateMarkdown, setupCheckboxListeners } from '../utils/MarkdownFormat';
-import MyPlugin from '../main';
+import { generateMarkdown } from '../utils/MarkdownFormat';
+import KindleVocabPlugin from '../main';
 
 export class SyncDatabaseModal extends Modal {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, private plugin: KindleVocabPlugin) {
 		super(app);
-		this.plugin = plugin;
 	}
 
 	onOpen() {
@@ -34,8 +31,8 @@ export class SyncDatabaseModal extends Modal {
 			new Notice('Starting sync...');
 
 			// Load vocab DB
-			const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}` });
-			const dbPath = getVocabDbPath();
+			const SQL = await initSqlJs({ locateFile: file => `../../sql/${file}` });
+			const dbPath = getVocabDbPath(this.plugin);
 
 			if (!(await this.app.vault.adapter.exists(dbPath))) {
 				throw new Error('❌ Vocab file not found.');
@@ -86,7 +83,7 @@ export class SyncDatabaseModal extends Modal {
 			insertStmt.free();
 
 			// Optional: sync dictionary info from CSV
-			const csvPath = getDictionaryCsvPath();
+			const csvPath = getDictionaryCsvPath(this.plugin);
 			if (await this.app.vault.adapter.exists(csvPath)) {
 				const csvContent = await this.app.vault.adapter.read(csvPath);
 				const rows = await this.parseCsv(csvContent);
@@ -107,7 +104,19 @@ export class SyncDatabaseModal extends Modal {
 			const folder = this.plugin.settings?.markdownFolderPath?.trim() || '';
 			const fileName = 'My Vocabulary Builder.md';
 			const mdPath = normalizePath(folder ? `${folder}/${fileName}` : fileName);
-			await this.app.vault.adapter.write(mdPath, markdown);
+
+			// ✅ Create folder if it doesn't exist
+			if (folder && !this.app.vault.getAbstractFileByPath(folder)) {
+				await this.app.vault.createFolder(folder);
+			}
+
+			const existingFile = this.app.vault.getAbstractFileByPath(mdPath);
+			if (existingFile instanceof TFile) {
+				await this.app.vault.modify(existingFile, markdown);
+			} else {
+				await this.app.vault.create(mdPath, markdown);
+			}
+
 
 			// Save updated DB
 			const updatedDb = db.export();
@@ -120,7 +129,6 @@ export class SyncDatabaseModal extends Modal {
 			const mdFile = this.app.vault.getAbstractFileByPath(mdPath);
 			if (mdFile instanceof TFile) {
 				await this.app.workspace.getLeaf(true).openFile(mdFile);
-				setTimeout(() => setupCheckboxListeners(this.app), 500);
 			}
 		} catch (err) {
 			console.error(err);

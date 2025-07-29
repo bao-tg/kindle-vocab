@@ -1,18 +1,25 @@
+import { get } from 'http';
 import { App, Modal, Notice, ButtonComponent, normalizePath } from 'obsidian';
 import initSqlJs from 'sql.js/dist/sql-wasm.js';
+import KindleVocabPlugin from 'src/main';
+import { getAssetsFolderPath } from 'src/utils/PathHelper';
 
 export class DatabaseUploadModal extends Modal {
-	private fileInputEl: HTMLInputElement;
-	private readonly allowedExtensions = new Set(['db', 'sqlite', 'db3']);
-	private readonly targetFolder = `${this.app.vault.configDir}/plugins/kindle-vocab/src/data`;
-	private readonly targetFileName = 'vocab.db';
-
-	constructor(app: App) {
+	constructor(app: App, private plugin: KindleVocabPlugin) {
 		super(app);
+		this.plugin = plugin;
 	}
 
-	onOpen() {
+	private fileInputEl: HTMLInputElement;
+	private readonly allowedExtensions = new Set(['db', 'sqlite', 'db3']);
+	private readonly targetFileName = 'vocab.db';
+	private targetFolder = getAssetsFolderPath(this.plugin);
+
+	async onOpen() {
 		const { contentEl } = this;
+		
+		// Load settings if not already done
+		if (!this.plugin.settings) await this.plugin.loadSettings?.();
 		contentEl.empty();
 
 		contentEl.createEl('h2', { text: 'Upload a Vocabulary File (DB)' });
@@ -48,9 +55,7 @@ export class DatabaseUploadModal extends Modal {
 
 		try {
 			const buffer = new Uint8Array(await file.arrayBuffer());
-			const SQL = await initSqlJs({
-				locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
-			});
+			const SQL = await initSqlJs({ locateFile: file => `../../sql/${file}` });
 
 			const vault = this.app.vault;
 			const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
@@ -113,7 +118,7 @@ export class DatabaseUploadModal extends Modal {
 
 		// Ensure folder exists
 		if (!(await vault.adapter.exists(folderPath))) {
-			await this.createFolderRecursively(folderPath);
+			await vault.createFolder(folderPath);
 		}
 
 		// Remove old file
@@ -122,17 +127,6 @@ export class DatabaseUploadModal extends Modal {
 		}
 
 		await vault.createBinary(filePath, data);
-	}
-
-	private async createFolderRecursively(path: string) {
-		const parts = path.split('/');
-		let currentPath = '';
-		for (const part of parts) {
-			currentPath = normalizePath(`${currentPath}/${part}`);
-			if (!(await this.app.vault.adapter.exists(currentPath))) {
-				await this.app.vault.createFolder(currentPath);
-			}
-		}
 	}
 
 	onClose() {

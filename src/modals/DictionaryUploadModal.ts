@@ -1,17 +1,26 @@
 import { App, Modal, Notice, ButtonComponent, normalizePath, TFile } from 'obsidian';
+import { getAssetsFolderPath } from 'src/utils/PathHelper';
+import KindleVocabPlugin from '../main';
+
 
 export class DictionaryUploadModal extends Modal {
-	private fileInputEl: HTMLInputElement;
-	private readonly allowedExtensions = new Set(['csv']);
-	private readonly targetFolder = `${this.app.vault.configDir}/plugins/kindle-vocab/src/data`;
-	private readonly targetFileName = 'dictionary.csv';
-
-	constructor(app: App) {
+	constructor(app: App, private plugin: KindleVocabPlugin) {
 		super(app);
 	}
 
-	onOpen() {
+	private fileInputEl: HTMLInputElement;
+	private readonly allowedExtensions = new Set(['csv']);
+	private readonly targetFileName = 'dictionary.csv';
+	private readonly targetFolder = getAssetsFolderPath(this.plugin);
+
+	async onOpen() {
 		const { contentEl } = this;
+
+		// Load settings if not already done
+		if (!this.plugin.settings) await this.plugin.loadSettings();
+		console.log('Plugin settings:', this.plugin.settings);
+
+
 		contentEl.empty();
 
 		contentEl.createEl('h2', { text: 'Upload a Dictionary File (CSV)' });
@@ -37,6 +46,8 @@ export class DictionaryUploadModal extends Modal {
 			new Notice('No file selected.');
 			return;
 		}
+
+		console.log('Target folder:', this.targetFolder);
 
 		const file = files[0];
 		const extension = file.name.split('.').pop()?.toLowerCase() || '';
@@ -69,9 +80,11 @@ export class DictionaryUploadModal extends Modal {
 		const folderPath = normalizePath(this.targetFolder);
 		const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
 
+		console.log('Saving file to:', filePath);
+
 		// Ensure folder exists (create recursively if needed)
 		if (!(await vault.adapter.exists(folderPath))) {
-			await this.createFolderRecursively(folderPath);
+			await	vault.createFolder(folderPath);
 		}
 
 		// Replace existing file
@@ -80,17 +93,6 @@ export class DictionaryUploadModal extends Modal {
 		}
 
 		await vault.createBinary(filePath, data);
-	}
-
-	private async createFolderRecursively(path: string) {
-		const parts = path.split('/');
-		let currentPath = '';
-		for (const part of parts) {
-			currentPath = normalizePath(`${currentPath}/${part}`);
-			if (!(await this.app.vault.adapter.exists(currentPath))) {
-				await this.app.vault.createFolder(currentPath);
-			}
-		}
 	}
 
 	onClose() {

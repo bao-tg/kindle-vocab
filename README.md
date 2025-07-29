@@ -85,7 +85,7 @@ npm run dev
 - Switch to **Preview mode (Ctrl + E)** to interact with checkboxes, and resync to track your learning progress
 
 
-<img src="demo/demo.gif" alt="Demo" width="800">
+<img src="media/demo.gif" alt="Demo" width="800">
 
 ---
 
@@ -136,7 +136,7 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 If you found this plugin useful, you can support its development:
 
 <a href="https://www.buymeacoffee.com/baotg" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-violet.png" alt="Buy Me A Coffee" width="140">
+  <img src="media/default-violet.png" alt="Buy Me A Coffee" width="140">
 </a>
 
 ---

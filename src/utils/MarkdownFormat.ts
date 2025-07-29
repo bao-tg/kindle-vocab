@@ -1,10 +1,5 @@
-import initSqlJs, { Database } from 'sql.js';
-import { getVocabDbPath } from './PathHelper';
-import { Vault, normalizePath, Notice } from 'obsidian';
+import { Database } from 'sql.js';
 
-/**
- * Generate interactive markdown from the MAIN table.
- */
 export async function generateMarkdown(db: Database, sortOrder: string): Promise<string> {
 	let query = `
 		SELECT word, context, book_title, information, learned
@@ -44,57 +39,4 @@ export async function generateMarkdown(db: Database, sortOrder: string): Promise
 	}
 
 	return md;
-}
-
-/**
- * Bind listeners to checkboxes in preview mode and update DB.
- */
-
-export function setupCheckboxListeners(app: { vault: Vault }) {
-	const previews = document.querySelectorAll('.markdown-preview-view');
-
-	if (!previews.length) {
-		console.warn('[VocabPlugin] No markdown-preview-view found, retrying...');
-		setTimeout(() => setupCheckboxListeners(app), 500);
-		return;
-	}
-
-	// Avoid duplicate listener attachment
-	const vocabListenerAttached = new WeakMap<object, boolean>();
-	vocabListenerAttached.set(previews, true);
-
-	previews.forEach((el) => {
-		el.addEventListener('click', async (e) => {
-			const target = e.target as HTMLElement;
-			if (target?.tagName !== 'INPUT') return;
-
-			const input = target as HTMLInputElement;
-			if (input.type !== 'checkbox' || !input.dataset.word) return;
-
-			const word = input.dataset.word;
-			const isLearned = input.checked ? 1 : 0;
-
-			try {
-				const SQL = await initSqlJs({
-					locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
-				});
-				const dbPath = getVocabDbPath();
-				const data = await app.vault.adapter.readBinary(dbPath);
-				const db = new SQL.Database(new Uint8Array(data));
-
-				const stmt = db.prepare(`UPDATE MAIN SET learned = ? WHERE word = ?`);
-				stmt.run([isLearned, word]);
-				stmt.free();
-
-				const updated = db.export();
-				await app.vault.adapter.writeBinary(dbPath, updated);
-				db.close();
-
-				new Notice(`✅ ${word} marked as ${isLearned ? 'learned' : 'unlearned'}`);
-			} catch (err) {
-				console.error(err);
-				new Notice('❌ Failed to update word status.');
-			}
-		});
-	});
 }

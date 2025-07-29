@@ -6,6 +6,4 @@ export function registerRibbons(plugin: Plugin) {
 	const syncRibbon = plugin.addRibbonIcon('book-open', 'Sync Kindle Vocabulary', () => {
         new SyncDatabaseModal(plugin.app, this).open();
     });
-
-	syncRibbon.addClass('my-plugin-sync-ribbon');
 }

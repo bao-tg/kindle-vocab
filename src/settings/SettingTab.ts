@@ -1,22 +1,19 @@
-import { App, PluginSettingTab, Setting, Notice, normalizePath, TFolder } from 'obsidian';
-import MyPlugin from '../main';
+import { App, PluginSettingTab, Setting, Notice, TFolder, normalizePath } from 'obsidian';
+import KindleVocabPlugin from '../main';
+import {FolderSuggest, isTFolder} from '../utils/FolderSuggest';
 
 export class KindleVocabSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, private plugin: KindleVocabPlugin) {
 		super(app, plugin);
-		this.plugin = plugin;
 	}
 
 	async display(): Promise<void> {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		// Header
-		containerEl.createEl('h1', { text: 'Kindle Vocabulary Sync Settings' });
+		// 🔹 Section: Sync Options
+		containerEl.createEl('h3', { text: 'Sync Options' });
 
-		// Setting: Sort Order
 		new Setting(containerEl)
 			.setName('Sort Order')
 			.setDesc('Choose how to sort your markdown file.')
@@ -32,51 +29,74 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 				});
 			});
 
-		function isTFolder(f: any): f is TFolder {
-				return f instanceof TFolder;
-			}
-
-		// Setting: Markdown Output Folder
+		// 🔹 Section: Markdown Output Folder
 		new Setting(containerEl)
 			.setName('Markdown Output Folder')
 			.setDesc('Choose the folder to save your markdown file.')
-			.addDropdown(drop => {
+			.addText(text => {
+			const current = this.plugin.settings.markdownFolderPath || '';
+			text.setValue(current);
+			console.log('Current markdown folder:', current);
 
-				const folders = this.app.vault.getAllLoadedFiles().filter(isTFolder);
-				const current = this.plugin.settings.markdownFolderPath || '';
+			// Attach the FolderSuggest to the text input
+			new FolderSuggest(this.app, text.inputEl);
+			
+			// onblur ensure the change only happens when the user leaves the input
+			text.inputEl.onblur = async () => {
+				const value = text.getValue().trim();
+				const folderExists = this.app.vault.getAllLoadedFiles()
+					.some(f => isTFolder(f) && f.path === value);
 
-				drop.addOption('', 'Vault root');
-				for (const folder of folders) {
-					drop.addOption(folder.path, folder.path);
+				if (value && !folderExists) {
+					new Notice('Invalid folder path entered');
+					return;
 				}
 
-				drop.setValue(current);
+				this.plugin.settings.markdownFolderPath = value;
+				await this.plugin.saveSettings();
+				new Notice(`Markdown folder set to: ${value || 'Vault root'}`);
+				};
+		});
 
-				drop.onChange(async (value) => {
-					this.plugin.settings.markdownFolderPath = value;
-					await this.plugin.saveSettings();
-					new Notice(`Markdown folder set to: ${value || 'Vault root'}`);
-				});
-			});
+		// 🔹 Section: Database Folder
+		new Setting(containerEl)
+			.setName('Assets Folder')
+			.setDesc('Choose the folder to save your database/dictionary files.')
+			.addText(text => {
+			const current = this.plugin.settings.assetsFolderPath || '';
+			text.setValue(current);
 
-		// Developer credit and Buy Me a Coffee button
-		const sponsorSetting = new Setting(containerEl)
+			// Attach the FolderSuggest to the text input
+			new FolderSuggest(this.app, text.inputEl);
+
+			text.inputEl.onblur = async () => {
+				const value = text.getValue().trim();
+				const folderExists = this.app.vault.getAllLoadedFiles()
+					.some(f => isTFolder(f) && f.path === value);
+
+				if (value && !folderExists) {
+					new Notice('Invalid folder path entered');
+					return;
+				}
+
+				this.plugin.settings.assetsFolderPath = value;
+				await this.plugin.saveSettings();
+				new Notice(`Assets folder set to: ${value || 'Vault root'}`);
+				};
+		});
+
+
+		// 🔹 Section: Sponsor 
+		new Setting(containerEl)
 			.setName('Sponsor')
-			.setDesc('Developed and maintained by Truong Gia Bao');
-
-		const coffeeContainer = sponsorSetting.settingEl.createDiv();
-		const coffeeButton = coffeeContainer.createEl('a', {
-			href: 'https://www.buymeacoffee.com/bao-tg',
-		});
-		coffeeButton.setAttr('target', '_blank');
-
-		const img = coffeeButton.createEl('img', {
-			attr: {
-				src: 'https://cdn.buymeacoffee.com/buttons/v2/default-violet.png',
-				alt: 'Buy Me a Coffee',
-				width: '120',
-				height: '35'
-			}
-		});
-	}
+			.setDesc('Developed and maintained by Truong Gia Bao')
+			.addButton((btn) =>
+				btn
+					.setButtonText('☕ Buy Me a Coffee')
+					.setCta()
+					.onClick(() => {
+						window.open('https://www.buymeacoffee.com/bao-tg', '_blank');
+					})
+			);
+		}
 }
