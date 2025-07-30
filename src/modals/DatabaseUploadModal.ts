@@ -1,8 +1,9 @@
-import { get } from 'http';
 import { App, Modal, Notice, ButtonComponent, normalizePath } from 'obsidian';
 import initSqlJs from 'sql.js/dist/sql-wasm.js';
 import KindleVocabPlugin from 'src/main';
 import { getAssetsFolderPath } from 'src/utils/PathHelper';
+//@ts-ignore
+import SqlJsWasm from '../../node_modules/sql.js/dist/sql-wasm.wasm';
 
 export class DatabaseUploadModal extends Modal {
 	constructor(app: App, private plugin: KindleVocabPlugin) {
@@ -53,11 +54,13 @@ export class DatabaseUploadModal extends Modal {
 		}
 
 		try {
-			const buffer = new Uint8Array(await file.arrayBuffer());
 			const SQL = await initSqlJs({
-					locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
-				});
+				wasmBinary: SqlJsWasm
+			});
 
+			
+			// Read the uploaded file
+			const buffer = new Uint8Array(await file.arrayBuffer());
 			const vault = this.app.vault;
 			const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
 
@@ -70,7 +73,7 @@ export class DatabaseUploadModal extends Modal {
 				new Notice('✅ Database updated (excluding MAIN table).');
 			}
 		} catch (err) {
-			console.error(err);
+			console.error('Database upload error:', err);
 			new Notice('❌ Error processing the database file.');
 		} finally {
 			this.close();
@@ -78,38 +81,52 @@ export class DatabaseUploadModal extends Modal {
 	}
 
 	private async mergeDatabases(SQL: any, filePath: string, newData: Uint8Array) {
-		const vault = this.app.vault;
-		const currentData = await vault.adapter.readBinary(filePath);
-		const currentDB = new SQL.Database(new Uint8Array(currentData));
-		const newDB = new SQL.Database(newData);
+		try {
+			const vault = this.app.vault;
+			const currentData = await vault.adapter.readBinary(filePath);
+			const currentDB = new SQL.Database(new Uint8Array(currentData));
+			const newDB = new SQL.Database(newData);
 
-		const tablesRes = newDB.exec(`SELECT name FROM sqlite_master WHERE type='table';`);
-		const newTables = tablesRes?.[0]?.values?.map((row: any[]) => row[0]).filter((name: string) => name !== 'MAIN') || [];
+			const tablesRes = newDB.exec(`SELECT name FROM sqlite_master WHERE type='table';`);
+			const newTables = tablesRes?.[0]?.values?.map((row: any[]) => row[0]).filter((name: string) => name !== 'MAIN') || [];
 
-		for (const tableName of newTables) {
-			// Drop and recreate table
-			const createSQL = newDB.exec(`SELECT sql FROM sqlite_master WHERE name='${tableName}' AND type='table';`);
-			if (createSQL.length === 0) continue;
+			for (const tableName of newTables) {
+				try {
+					// Drop and recreate table
+					const createSQL = newDB.exec(`SELECT sql FROM sqlite_master WHERE name='${tableName}' AND type='table';`);
+					if (createSQL.length === 0) continue;
 
-			currentDB.run(`DROP TABLE IF EXISTS ${tableName};`);
-			currentDB.run(createSQL[0].values[0][0]);
+					currentDB.run(`DROP TABLE IF EXISTS ${tableName};`);
+					currentDB.run(createSQL[0].values[0][0]);
 
-			// Copy rows
-			const rowsRes = newDB.exec(`SELECT * FROM ${tableName};`);
-			if (rowsRes.length === 0) continue;
+					// Copy rows
+					const rowsRes = newDB.exec(`SELECT * FROM ${tableName};`);
+					if (rowsRes.length === 0) continue;
 
-			const { columns, values } = rowsRes[0];
-			for (const row of values) {
-				const placeholders = row.map(() => '?').join(', ');
-				currentDB.run(
-					`INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${placeholders});`,
-					row
-				);
+					const { columns, values } = rowsRes[0];
+					for (const row of values) {
+						const placeholders = row.map(() => '?').join(', ');
+						currentDB.run(
+							`INSERT INTO ${tableName} (${columns.join(', ')}) VALUES (${placeholders});`,
+							row
+						);
+					}
+				} catch (tableError) {
+					console.error(`Error processing table ${tableName}:`, tableError);
+					// Continue with other tables
+				}
 			}
-		}
 
-		const mergedData = currentDB.export();
-		await this.saveFile(new Uint8Array(mergedData));
+			const mergedData = currentDB.export();
+			await this.saveFile(new Uint8Array(mergedData));
+
+			// Clean up
+			currentDB.close();
+			newDB.close();
+		} catch (mergeError) {
+			console.error('Database merge error:', mergeError);
+			throw mergeError;
+		}
 	}
 
 	private async saveFile(data: Uint8Array) {
@@ -117,17 +134,22 @@ export class DatabaseUploadModal extends Modal {
 		const folderPath = normalizePath(this.targetFolder);
 		const filePath = normalizePath(`${this.targetFolder}/${this.targetFileName}`);
 
-		// Ensure folder exists
-		if (!(await vault.adapter.exists(folderPath))) {
-			await vault.createFolder(folderPath);
-		}
+		try {
+			// Ensure folder exists
+			if (!(await vault.adapter.exists(folderPath))) {
+				await vault.createFolder(folderPath);
+			}
 
-		// Remove old file
-		if (await vault.adapter.exists(filePath)) {
-			await vault.adapter.remove(filePath);
-		}
+			// Remove old file
+			if (await vault.adapter.exists(filePath)) {
+				await vault.adapter.remove(filePath);
+			}
 
-		await vault.createBinary(filePath, data);
+			await vault.createBinary(filePath, data);
+		} catch (saveError) {
+			console.error('File save error:', saveError);
+			throw saveError;
+		}
 	}
 
 	onClose() {

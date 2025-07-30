@@ -1,4 +1,3 @@
-import { Editor, MarkdownView } from 'obsidian';
 import KindleVocabPlugin from '../main';
 import { DatabaseUploadModal } from '../modals/DatabaseUploadModal';
 import { DictionaryUploadModal } from '../modals/DictionaryUploadModal';

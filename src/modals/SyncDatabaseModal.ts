@@ -4,6 +4,8 @@ import initSqlJs from 'sql.js/dist/sql-wasm.js';
 import { getVocabDbPath, getDictionaryCsvPath } from '../utils/PathHelper';
 import { generateMarkdown } from '../utils/MarkdownFormat';
 import KindleVocabPlugin from '../main';
+//@ts-ignore
+import SqlJsWasm from '../../node_modules/sql.js/dist/sql-wasm.wasm';
 
 export class SyncDatabaseModal extends Modal {
 	constructor(app: App, private plugin: KindleVocabPlugin) {
@@ -32,8 +34,8 @@ export class SyncDatabaseModal extends Modal {
 
 			// Load vocab DB
 			const SQL = await initSqlJs({
-					locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
-				});
+				wasmBinary: SqlJsWasm
+			});
 			const dbPath = getVocabDbPath(this.plugin);
 
 			if (!(await this.app.vault.adapter.exists(dbPath))) {

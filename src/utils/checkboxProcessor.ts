@@ -1,7 +1,9 @@
-import { MarkdownPostProcessorContext, Notice, Plugin } from "obsidian";
+import { MarkdownPostProcessorContext, Notice } from "obsidian";
 import initSqlJs from "sql.js";
 import { getVocabDbPath } from "./PathHelper";
 import KindleVocabPlugin from "../main";
+// @ts-ignore
+import SqlJsWasm from "../../node_modules/sql.js/dist/sql-wasm.wasm";
 
 export function registerCheckboxPostProcessor(plugin: KindleVocabPlugin) {
 	plugin.registerMarkdownPostProcessor(async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
@@ -15,7 +17,7 @@ export function registerCheckboxPostProcessor(plugin: KindleVocabPlugin) {
 
 				try {
 					const SQL = await initSqlJs({
-						locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.6.2/${file}`,
+						wasmBinary: SqlJsWasm
 					});
 					// Load settings
 					const dbPath = getVocabDbPath(plugin);

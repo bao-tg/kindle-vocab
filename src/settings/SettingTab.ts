@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, Notice, TFolder, normalizePath } from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice} from 'obsidian';
 import KindleVocabPlugin from '../main';
 import {FolderSuggest, isTFolder} from '../utils/FolderSuggest';
 
@@ -36,7 +36,6 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 			.addText(text => {
 			const current = this.plugin.settings.markdownFolderPath || '';
 			text.setValue(current);
-			console.log('Current markdown folder:', current);
 
 			// Attach the FolderSuggest to the text input
 			new FolderSuggest(this.app, text.inputEl);
