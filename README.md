@@ -74,6 +74,7 @@
 * [Webster’s Dictionary CSV](https://github.com/atthewreagan/WebstersEnglishDictionary)
 * [Wiktionary](https://en.wiktionary.org/wiki/Wiktionary:Main_Page)
 * [Microsoft Docs – DRM](https://learn.microsoft.com/vi-vn/windows-hardware/drivers/audio/digital-rights-management)
+* [VEED](https://www.veed.io/)
 
 ---
 
