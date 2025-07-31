@@ -1,7 +1,6 @@
 # Kindle Vocab Plugin for Obsidian
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
-[![Developer Docs](https://img.shields.io/badge/developers-documentation-green.svg)](https://bao-tg.github.io/blog/obsidian-kindle-vocab)
 
 **Kindle Vocab** is an Obsidian plugin that lets you import vocabulary lookups from your Kindle device and convert them into structured, interactive Markdown notes.
 
@@ -21,37 +20,6 @@
 
 ---
 
-## Installation Guide
-
-### For Normal Users  
-> Currently pending approval on the Obsidian Plugin Store.
-
-Once approved, you can simply:  
-1. Open **Settings → Community Plugins** in Obsidian.  
-2. Search for **“Kindle Vocab”**.  
-3. Click **Install**, then **Enable** the plugin.
-
-🔗 [Approval status (Obsidian PR #6510)](https://github.com/obsidianmd/obsidian-releases/pull/6510)
-
----
-
-### 🛠️ For Developers / Early Access
-
-**Warning**: Please **backup your vault** before proceeding.
-
-To install the plugin manually:
-
-```bash
-cd path/to/your-vault/.obsidian/plugins // If there is no `plugins` directory, create it
-git clone https://github.com/bao-tg/kindle-vocab
-cd kindle-vocab
-npm install
-npm run dev
-```
-
-> Alternatively, you can just download the `main.js` and `manifest.json` files and place them in a new `kindle-vocab` folder under `.obsidian/plugins/`.
----
-
 ## How to Use
 
 ### 1. Upload Your Vocabulary Database
@@ -59,7 +27,7 @@ npm run dev
 - Open the command palette (Ctrl + P) and run:  
   **`Upload your vocabulary database`**
 - Select your `vocab.db` file.  
-  You can find this file by connecting your Kindle to your computer via USB and searching for `vocab.db` inside the `Kindle (E:)` directory.
+  You can find this file by connecting your Kindle to your computer via USB and searching for `Kindle (E:)\system\vocab.db` inside the `Kindle (E:)` directory.
 
 ### 2. Upload a Dictionary File (CSV)
 
@@ -86,6 +54,13 @@ npm run dev
 
 
 <img src="media/demo.gif" alt="Demo" width="800">
+
+---
+
+## Notices when use
+
++ You shouldn't change the name of the `My Vocabulary Builder.md` file, since it will affect the checkbox learned/unlearned function.
++ Ìf you want to change the folder which is used to store the `vocab.db`, `dictionary.csv`, and `My Vocabulary Builder.md`, you can change it in Settings Tab.
 
 ---
 
@@ -128,6 +103,7 @@ This project is licensed under the [MIT License](https://opensource.org/licenses
 
 + Support other languages beside English
 + Better customized dictionary
++ Let the user move file, change file name dynamically, not through the settings.
 
 ---
 

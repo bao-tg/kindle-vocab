@@ -18,9 +18,6 @@ export default class KindleVocabPlugin extends Plugin {
 		registerRibbons(this);
 		registerCommands(this);
 
-		// 📌 Add status bar
-		this.addStatusBarItem().setText('Status Bar Text');
-
 		// 📌 Add settings tab
 		this.addSettingTab(new KindleVocabSettingTab(this.app, this));
 	}

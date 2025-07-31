@@ -7,6 +7,12 @@ import SqlJsWasm from "../../node_modules/sql.js/dist/sql-wasm.wasm";
 
 export function registerCheckboxPostProcessor(plugin: KindleVocabPlugin) {
 	plugin.registerMarkdownPostProcessor(async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+		// Check if the current active file is "My Vocabulary Builder.md"
+		const activeFile = plugin.app.workspace.getActiveFile();
+		if (!activeFile || activeFile.name !== "My Vocabulary Builder.md") {
+			return;
+		}
+
 		const checkboxes = el.querySelectorAll('input[type="checkbox"][data-word]');
 
 		checkboxes.forEach(checkbox => {
