@@ -19,7 +19,7 @@ export class DictionaryUploadModal extends Modal {
 		// Load settings if not already done
 		contentEl.empty();
 
-		contentEl.createEl('h2', { text: 'Upload a Dictionary File (CSV)' });
+		contentEl.createEl('h2', { text: 'Upload dictionary file (csv)' });
 
 		this.fileInputEl = contentEl.createEl('input', {
 			type: 'file',

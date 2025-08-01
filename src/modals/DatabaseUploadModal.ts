@@ -22,7 +22,7 @@ export class DatabaseUploadModal extends Modal {
 		// Load settings if not already done
 		contentEl.empty();
 
-		contentEl.createEl('h2', { text: 'Upload a Vocabulary File (DB)' });
+		contentEl.createEl('h2', { text: 'Upload vocabulary file (db)' });
 
 		this.fileInputEl = contentEl.createEl('input', {
 			type: 'file',
