@@ -1,7 +1,7 @@
 {
 	"id": "kindle-vocab",
 	"name": "Kindle Vocab",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"description": "Create the Markdown file from your Kindle Vocab Builder in your vault",
 	"author": "Truong Gia Bao",
 	"authorUrl": "https://github.com/bao-tg",

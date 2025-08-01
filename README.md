@@ -27,7 +27,7 @@
 - Open the command palette (Ctrl + P) and run:  
   **`Upload your vocabulary database`**
 - Select your `vocab.db` file.  
-  You can find this file by connecting your Kindle to your computer via USB and searching for `Kindle (E:)\system\vocab.db` inside the `Kindle (E:)` directory.
+  You can find this file by connecting your Kindle to your computer via USB and searching for `Kindle (E:)/system/vocabulary/vocab.db`.
 
 ### 2. Upload a Dictionary File (CSV)
 
