@@ -10,11 +10,7 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 	async display(): Promise<void> {
 		const { containerEl } = this;
 		containerEl.empty();
-
-		new Setting(containerEl)
-			.setName('Kindle Vocabulary')
-			.setHeading();
-
+		
 		new Setting(containerEl)
 			.setDesc('Choose how to sort your markdown file.')
 			.addDropdown(drop => {
