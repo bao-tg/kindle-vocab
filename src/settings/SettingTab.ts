@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, Notice} from 'obsidian';
+import { App, PluginSettingTab, Setting, Notice, TFolder, normalizePath } from 'obsidian';
 import KindleVocabPlugin from '../main';
 import {FolderSuggest, isTFolder} from '../utils/FolderSuggest';
 
@@ -11,15 +11,13 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
+		// 🔹 Section: General Settings
 		new Setting(containerEl)
-			.setName('Kindle Vocabulary')
-			.setHeading();
-
-		new Setting(containerEl)
+			.setName('Sort order')
 			.setDesc('Choose how to sort your markdown file.')
 			.addDropdown(drop => {
 				drop
-					.addOption('timestamp', 'Newest first')
+					.addOption('timestamp', 'Newest first (timestamp)')
 					.addOption('unlearned', 'Unlearned first');
 				drop.setValue(this.plugin.settings.sortOrder || 'timestamp');
 				drop.onChange(async (value) => {
@@ -31,6 +29,7 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 
 		// 🔹 Section: Markdown output folder
 		new Setting(containerEl)
+			.setName('Markdown output folder')
 			.setDesc('Choose the folder to save your markdown file.')
 			.addText(text => {
 			const current = this.plugin.settings.markdownFolderPath || '';
@@ -42,9 +41,10 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 			// onblur ensure the change only happens when the user leaves the input
 			text.inputEl.onblur = async () => {
 				const value = text.getValue().trim();
-				const folder = this.app.vault.getFolderByPath(value);
+				const folderExists = this.app.vault.getAllLoadedFiles()
+					.some(f => isTFolder(f) && f.path === value);
 
-				if (value && !folder) {
+				if (value && !folderExists) {
 					new Notice('Invalid folder path entered');
 					return;
 				}
@@ -52,11 +52,12 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 				this.plugin.settings.markdownFolderPath = value;
 				await this.plugin.saveSettings();
 				new Notice(`Markdown folder set to: ${value || 'Vault root'}`);
-				}
-			});
+				};
+		});
 
-		// 🔹 Section: Database Folder
+		// 🔹 Section: Database folder
 		new Setting(containerEl)
+			.setName('Assets folder')
 			.setDesc('Choose the folder to save your database/dictionary files.')
 			.addText(text => {
 			const current = this.plugin.settings.assetsFolderPath || '';
@@ -67,9 +68,10 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 
 			text.inputEl.onblur = async () => {
 				const value = text.getValue().trim();
-				const folder = this.app.vault.getFolderByPath(value);
+				const folderExists = this.app.vault.getAllLoadedFiles()
+					.some(f => isTFolder(f) && f.path === value);
 
-				if (value && !folder) {
+				if (value && !folderExists) {
 					new Notice('Invalid folder path entered');
 					return;
 				}
@@ -80,8 +82,10 @@ export class KindleVocabSettingTab extends PluginSettingTab {
 				};
 		});
 
+
 		// 🔹 Section: Sponsor 
 		new Setting(containerEl)
+			.setName('Sponsor')
 			.setDesc('Developed and maintained by Truong Gia Bao')
 			.addButton((btn) =>
 				btn

@@ -16,7 +16,7 @@ export class SyncDatabaseModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 
-		contentEl.createEl('h2', { text: 'Sync Your Vocabulary Builder' });
+		contentEl.createEl('h2', { text: 'Sync your Vocabulary Builder' });
 		contentEl.createEl('p', {
 			text: 'This will synchronize your Kindle lookups and create a markdown summary. Make sure your vocab database and dictionary file are ready.'
 		});
