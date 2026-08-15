@@ -1,3 +1,5 @@
+
+
 # Kindle Vocab Plugin for Obsidian
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)  
@@ -71,7 +73,7 @@
 * [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 * [esbuild Documentation](https://esbuild.github.io/)
 * [GCIDE Dictionary](https://gcide.gnu.org.ua/)
-* [Webster’s Dictionary CSV](https://github.com/atthewreagan/WebstersEnglishDictionary)
+* [Webster’s Dictionary CSV](https://github.com/matthewreagan/WebstersEnglishDictionary)
 * [Wiktionary](https://en.wiktionary.org/wiki/Wiktionary:Main_Page)
 * [Microsoft Docs – DRM](https://learn.microsoft.com/vi-vn/windows-hardware/drivers/audio/digital-rights-management)
 * [VEED](https://www.veed.io/)
@@ -117,4 +119,3 @@ If you found this plugin useful, you can support its development:
 </a>
 
 ---
-
